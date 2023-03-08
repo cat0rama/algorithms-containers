@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace own {
+namespace own::defines {
     constexpr std::size_t DEFAULT_CAPACITY = 5;
     constexpr std::size_t FACTOR = 2;
     constexpr std::size_t CNULL = 0;
