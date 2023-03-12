@@ -1,22 +1,19 @@
 ﻿#include <algorithm>
-#include <array>
-#include <fstream>
 #include <iostream>
 #include <iterator>
-#include <set>
 #include <type_traits>
 #include <vector>
+#include <memory>
 
 #include "defines.hpp"
 #include "iterator.hpp"
 
 // https://en.cppreference.com/w/cpp/container/vector
-// Спасибо Мещерину и Владимирову за лекции :)
-// Сделать тесты(Gtest)
 
 namespace own {
 using namespace defines;
-template <class T, class Allocator = std::allocator<T>> class vector {
+template <class T, class Allocator = std::allocator<T>>
+class vector final {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -102,27 +99,27 @@ template <class T, class Allocator = std::allocator<T>> class vector {
             return iterator(t_lhs - t_rhs.m_data);
         }
 
-        friend bool operator==(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator==(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data == t_lhs.m_data;
         }
 
-        friend bool operator!=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator!=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data != t_lhs.m_data;
         }
 
-        friend bool operator>(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator>(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data > t_lhs.m_data;
         }
 
-        friend bool operator<(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator<(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data < t_lhs.m_data;
         }
 
-        friend bool operator>=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator>=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data >= t_lhs.m_data;
         }
 
-        friend bool operator<=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
+        friend constexpr bool operator<=(const iterator& t_rhs, const iterator& t_lhs) noexcept {
             return t_rhs.m_data <= t_lhs.m_data;
         }
 
@@ -133,15 +130,15 @@ template <class T, class Allocator = std::allocator<T>> class vector {
   public:
     using iterator = iterator_wrapper<NON_CONST>;
     using const_iterator = iterator_wrapper<CONST>;
-    using reverse_iterator = std::reverse_iterator<iterator>; // Пока что stdшный итератор
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+    using reverse_iterator = own::reverse_iterator<iterator>;
+    using const_reverse_iterator = own::reverse_iterator<const_iterator>;
 
   public:
     constexpr vector() : m_capacity(DEFAULT_CAPACITY), m_size(CNULL) {
         m_data = m_allocator.allocate(m_capacity);
     }
 
-    explicit constexpr vector(std::size_t t_size) : m_size(t_size), m_capacity(t_size * FACTOR) {
+    explicit constexpr vector(std::size_t t_capacity) : m_size(CNULL), m_capacity(t_capacity * FACTOR) {
         m_data = m_allocator.allocate(m_capacity);
     }
 
@@ -151,7 +148,8 @@ template <class T, class Allocator = std::allocator<T>> class vector {
         std::fill(m_data, m_data + m_capacity, t_element);
     }
 
-    template<typename CC, typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<CC>>>>
+    template <typename CC,
+              typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<CC>>>>
     constexpr vector(CC&& t_vector) {
         Initialize(std::forward<CC>(t_vector));
     }
@@ -159,7 +157,8 @@ template <class T, class Allocator = std::allocator<T>> class vector {
     ~vector() { m_allocator.deallocate(m_data, m_capacity); }
 
   public:
-    template<typename TT, typename = std::enable_if_t<std::is_same_v<vector<T>, std::remove_reference_t<TT>>>>
+    template <typename TT,
+              typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<TT>>>>
     constexpr vector& operator=(TT&& t_vector) {
         if (this != &t_vector) {
             m_allocator.deallocate(m_data, m_size);
@@ -167,6 +166,7 @@ template <class T, class Allocator = std::allocator<T>> class vector {
         }
         return *this;
     }
+
   private:
     template <typename Y>
     constexpr void Initialize(Y&& t_vector) noexcept(!std::is_lvalue_reference_v<Y>) {
@@ -175,7 +175,7 @@ template <class T, class Allocator = std::allocator<T>> class vector {
             m_capacity = t_vector.m_capacity;
             m_allocator = t_vector.m_allocator;
             m_data = m_allocator.allocate(m_capacity);
-            std::copy(t_vector.m_data, t_vector.m_data + m_capacity, m_data);
+            std::copy(t_vector.m_data, t_vector.m_data + m_size, m_data);
         } else {
             m_size = std::exchange(t_vector.m_size, 0);
             m_capacity = std::exchange(t_vector.m_capacity, 0);
@@ -184,14 +184,8 @@ template <class T, class Allocator = std::allocator<T>> class vector {
         }
     }
 
-public:
-    void Fill(const T& t_value) { std::fill(m_data, m_data + m_size, t_value); }
-
-    void Out() {
-        for (std::size_t i = 0; i < m_size; i++) {
-            std::cout << m_data[i];
-        }
-    }
+  public:
+    void fill(const_reference t_value) { std::fill(m_data, m_data + m_size, t_value); }
 
     pointer data() const noexcept { return m_data; }
 
@@ -199,9 +193,63 @@ public:
 
     iterator end() const noexcept { return iterator(m_data + m_size); }
 
-    void push_back(const T& t_elem) {}
+    reverse_iterator rbegin() const noexcept { return reverse_iterator(m_data + m_size); }
 
-    void pop_back() noexcept {}
+    reverse_iterator rend() const noexcept { return reverse_iterator(m_data); }
+
+    template<typename E>
+    void emplace_back() {
+
+    }
+
+    template<typename PP>
+    void push_back(PP&& t_elem) {
+        if  (m_capacity == m_size) {
+            reserve(m_size * 2);
+        }
+        // don't use allocator.construct for practice with placement new.
+        new (m_data + m_size++) T(std::forward<PP>(t_elem));
+    }
+
+    void pop_back() noexcept {
+        m_size--;
+        (m_data + m_size)->~T();
+    }
+
+    void resize(std::size_t t_size, const T& t_value = T()) {
+        if (t_size > m_capacity) {
+            reserve(t_size);
+        }
+
+        m_size = t_size;
+    }
+
+    void reserve(std::size_t t_size) {
+        if (m_capacity >= t_size) {
+            return;
+        }
+
+        auto new_arr = m_allocator.allocate(t_size);  // allocate memory without call default constructor
+
+        try {
+            std::uninitialized_move(m_data, m_data + m_size, new_arr);
+        }  catch (...) {
+            m_allocator.deallocate(new_arr, t_size);    // delete mem and call destructor
+            THROW_FURTHER;
+        }
+
+        m_allocator.deallocate(m_data, m_capacity);
+        m_data = std::exchange(new_arr, nullptr);
+        m_capacity = t_size;
+    }
+
+    constexpr std::size_t size() const noexcept {
+        return m_size;
+    }
+
+    constexpr std::size_t capacity() const noexcept {
+        return m_capacity;
+    }
 
   private:
     pointer m_data;
@@ -212,6 +260,31 @@ public:
 } // namespace own
 
 using namespace own;
+
+class Test {
+public:
+    Test(int _a): a(_a) {
+        ptr = new int[a];
+    }
+
+    Test(Test&&) {
+    }
+
+    Test(const Test&) {
+
+    }
+
+    int getA() {
+        return a;
+    }
+
+    ~Test() {
+        delete[] ptr;
+    }
+private:
+    int *ptr;
+    int a;
+};
 
 int main() {
     // Компайл тайм тестики
@@ -244,18 +317,26 @@ int main() {
 
     //    i.data()[10] = 9;
 
-    try {
-    vector<int> a(10);
-    a = vector<int>(23);
+//    vector<int> a(10);
+//    a = vector<int>(23);
 
-    vector<int> l(20);
+//    vector<int> l(20);
 
-    a = l;
-    a.Fill(3);
-    a = vector<int>(5, 3);
-    } catch(std::runtime_error r) {
-        std::cout << r.what();
-    }
+//    a = l;
+//    a = vector<int>(5, 3);
+//    a.fill(10);
 
-    //std::for_each(a.begin(), a.end(), [](int a) { std::cout << a; });
+//    std::for_each(a.begin(), a.end(), [](int a) { std::cout << a; });
+
+    vector<int> a(10, 5);
+
+    a.resize(15);
+
+    std::for_each(a.begin(), a.end(), [](auto a) { std::cout << a << ' '; });
+
+    std::vector<int> l(10, 5);
+
+    std::cout << std::endl;
+    l.resize(12);
+    std::for_each(l.begin(), l.end(), [](auto a) { std::cout << a << ' '; });
 }
