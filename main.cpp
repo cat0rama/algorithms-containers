@@ -41,23 +41,23 @@ class vector final {
         constexpr iterator_wrapper(pointer t_ptr) noexcept : m_data(t_ptr) {}
 
       public:
-        constexpr iterator_wrapper& operator++() noexcept {
+        constexpr iterator& operator++() noexcept {
             m_data++;
             return *this;
         }
 
-        constexpr iterator_wrapper operator++(int) noexcept {
+        constexpr iterator operator++(int) noexcept {
             auto tmp = *this;
             ++(*this);
             return tmp;
         }
 
-        constexpr iterator_wrapper& operator--() noexcept {
+        constexpr iterator& operator--() noexcept {
             m_data++;
             return *this;
         }
 
-        constexpr iterator_wrapper operator--(int) noexcept {
+        constexpr iterator operator--(int) noexcept {
             auto tmp = *this;
             ++(*this);
             return tmp;
@@ -177,8 +177,8 @@ class vector final {
             m_data = m_allocator.allocate(m_capacity);
             std::copy(t_vector.m_data, t_vector.m_data + m_size, m_data);
         } else {
-            m_size = std::exchange(t_vector.m_size, 0);
-            m_capacity = std::exchange(t_vector.m_capacity, 0);
+            m_size = std::exchange(t_vector.m_size, CNULL);
+            m_capacity = std::exchange(t_vector.m_capacity, CNULL);
             m_data = std::exchange(t_vector.m_data, nullptr);
             std::swap(m_allocator, t_vector.m_allocator);
         }
@@ -193,21 +193,32 @@ class vector final {
 
     iterator end() const noexcept { return iterator(m_data + m_size); }
 
+    const_iterator cbegin() const noexcept { return const_iterator(m_data); }
+
+    const_iterator cend() const noexcept { return const_iterator(m_data + m_size); }
+
     reverse_iterator rbegin() const noexcept { return reverse_iterator(m_data + m_size); }
 
     reverse_iterator rend() const noexcept { return reverse_iterator(m_data); }
 
-    template<typename E>
-    void emplace_back() {
+    const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(m_data + m_size); }
 
+    const_reverse_iterator crend() const noexcept { return const_reverse_iterator(m_data); }
+
+    template<typename ...Args>
+    reference emplace_back(Args&&... t_args) {
+        if  (m_capacity == m_size) {
+            reserve(m_size * FACTOR);
+        }
+        // don't use allocator.construct for practice with placement new.
+        return *new (m_data + m_size++) T(std::forward<Args>(t_args)...);
     }
 
     template<typename PP>
     void push_back(PP&& t_elem) {
         if  (m_capacity == m_size) {
-            reserve(m_size * 2);
+            reserve(m_size * FACTOR);
         }
-        // don't use allocator.construct for practice with placement new.
         new (m_data + m_size++) T(std::forward<PP>(t_elem));
     }
 
@@ -216,11 +227,10 @@ class vector final {
         (m_data + m_size)->~T();
     }
 
-    void resize(std::size_t t_size, const T& t_value = T()) {
+    void resize(std::size_t t_size, const_reference = T()) {
         if (t_size > m_capacity) {
             reserve(t_size);
         }
-
         m_size = t_size;
     }
 
@@ -263,25 +273,18 @@ using namespace own;
 
 class Test {
 public:
-    Test(int _a): a(_a) {
-        ptr = new int[a];
+    Test(int _a, std::string): a(_a) {
+        a = _a;
     }
 
-    Test(Test&&) {
-    }
-
-    Test(const Test&) {
-
-    }
 
     int getA() {
         return a;
     }
 
     ~Test() {
-        delete[] ptr;
     }
-private:
+public:
     int *ptr;
     int a;
 };
@@ -328,15 +331,11 @@ int main() {
 
 //    std::for_each(a.begin(), a.end(), [](int a) { std::cout << a; });
 
-    vector<int> a(10, 5);
 
-    a.resize(15);
+    vector<Test> a(10);
 
-    std::for_each(a.begin(), a.end(), [](auto a) { std::cout << a << ' '; });
+    a.emplace_back(3, "hello");
+    a.emplace_back(10, "lol");
 
-    std::vector<int> l(10, 5);
-
-    std::cout << std::endl;
-    l.resize(12);
-    std::for_each(l.begin(), l.end(), [](auto a) { std::cout << a << ' '; });
+    std::for_each(a.begin(), a.end(), [](auto& a) { std::cout << a.a << ' '; });
 }
