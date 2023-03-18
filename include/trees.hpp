@@ -17,8 +17,8 @@ struct ITree {
 template <typename T> struct TreeNode : ITree {
     TreeNode() : m_left(nullptr), m_right(nullptr) {}
 
-    template <typename TT, typename = std::enable_if_t<
-                               !std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
+    template <typename TT,
+              typename = std::enable_if_t<!std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
     constexpr explicit TreeNode(TT&& t_val) : m_val(std::forward<TT>(t_val)) {}
 
     template <typename TT>
@@ -26,8 +26,7 @@ template <typename T> struct TreeNode : ITree {
         : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right) {}
 
     constexpr TreeNode(TreeNode&& t_node) noexcept {
-        static_assert(std::is_move_assignable_v<decltype(t_node.m_val)>,
-                      "Y nego peremechenia net! Blyat!!!");
+        static_assert(std::is_move_assignable_v<decltype(t_node.m_val)>, "object cannot be moved.");
         m_val = std::exchange(t_node.m_val, T());
         m_left = std::exchange(t_node.m_left, nullptr);
         m_right = std::exchange(t_node.m_right, nullptr);
@@ -44,14 +43,15 @@ template <typename T> struct TreeNode : ITree {
 template <typename T> struct AVLNode : TreeNode<T> {
     AVLNode() : TreeNode<T>() {}
 
-    template <typename TT, typename = std::enable_if_t<
-                               !std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
-    explicit AVLNode(TT&& t_val) : TreeNode<T>(std::forward<TT>(t_val)) {}
+    template <typename TT,
+              typename = std::enable_if_t<!std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
+    constexpr explicit AVLNode(TT&& t_val) : TreeNode<T>(std::forward<TT>(t_val)) {}
 
     template <typename TT>
-    AVLNode(TT&& t_val, AVLNode* t_left, AVLNode* t_right) : TreeNode<T>(t_val, t_left, t_right) {}
+    constexpr AVLNode(TT&& t_val, AVLNode* t_left, AVLNode* t_right)
+        : TreeNode<T>(std::forward<TT>(t_val), t_left, t_right) {}
 
-    AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
+    constexpr AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
         m_height = std::exchange(t_node.m_height, 0);
     }
 

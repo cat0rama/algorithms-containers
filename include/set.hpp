@@ -4,7 +4,10 @@
 #include "trees.hpp"
 
 namespace own {
-template <typename T, typename Allocator = std::allocator<T>> class set { public: };
+template <typename T, typename Allocator = std::allocator<T>> class set {
+public:
+
+};
 
 } // namespace own
 

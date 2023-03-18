@@ -63,6 +63,15 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     }
 
   private:
+    template <typename Iter> void safe_cpy(Iter* t_from, Iter* t_to, std::size_t t_size) {
+        try {
+            std::uninitialized_copy(t_from, t_from + t_size, t_to);
+        } catch (...) {
+            m_allocator.deallocate(t_to, t_size); // delete mem and call destructor
+            THROW_FURTHER;
+        }
+    }
+
     template <typename Y>
     constexpr void Initialize(Y&& t_vector) noexcept(!std::is_lvalue_reference_v<Y>) {
         if constexpr (std::is_lvalue_reference_v<Y>) {
@@ -70,7 +79,7 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
             m_capacity = t_vector.m_capacity;
             m_allocator = t_vector.m_allocator;
             m_data = m_allocator.allocate(m_capacity);
-            std::copy(t_vector.m_data, t_vector.m_data + m_size, m_data);
+            safe_cpy(t_vector.m_data, m_data, m_size);
         } else {
             m_size = std::exchange(t_vector.m_size, 0);
             m_capacity = std::exchange(t_vector.m_capacity, 0);
@@ -117,12 +126,15 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         new (m_data + m_size++) T(std::forward<PP>(t_elem));
     }
 
-    void pop_back() noexcept {
+    void pop_back() {
+        if (m_size <= 1) {
+            throw std::underflow_error("vector is empty.\n");
+        }
         m_size--;
         (m_data + m_size)->~T();
     }
 
-    void resize(std::size_t t_size, const_reference = T()) {
+    void resize(std::size_t t_size) {
         if (t_size > m_capacity) {
             reserve(t_size);
         }
@@ -133,18 +145,12 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         if (m_capacity >= t_size) {
             return;
         }
-
         auto new_arr =
             m_allocator.allocate(t_size); // allocate memory without call default constructor
 
-        try {
-            std::uninitialized_move(m_data, m_data + m_size, new_arr);
-        } catch (...) {
-            m_allocator.deallocate(new_arr, t_size); // delete mem and call destructor
-            THROW_FURTHER;
-        }
-
+        safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);
+
         m_data = std::exchange(new_arr, nullptr);
         m_capacity = t_size;
     }
