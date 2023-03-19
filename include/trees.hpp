@@ -1,66 +1,73 @@
 #ifndef TREES_HPP_
 #define TREES_HPP_
 
-#include <cstdint>
-#include <memory>
-#include <utility>
+#include "nodes.hpp"
+#include "type_traits.hpp"
+
+#include <iostream>
 
 namespace own {
-
-struct ITree {
-    ITree() = default;
-    ITree(const ITree&) = delete;
-    ITree& operator=(ITree&&) = delete;
-    virtual ~ITree() = default;
-};
-
-template <typename T> struct TreeNode : ITree {
-    TreeNode() : m_left(nullptr), m_right(nullptr) {}
-
-    template <typename TT,
-              typename = std::enable_if_t<!std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
-    constexpr explicit TreeNode(TT&& t_val) : m_val(std::forward<TT>(t_val)) {}
-
-    template <typename TT>
-    constexpr TreeNode(TT&& t_val, TreeNode* t_left, TreeNode* t_right)
-        : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right) {}
-
-    constexpr TreeNode(TreeNode&& t_node) noexcept {
-        static_assert(std::is_move_assignable_v<decltype(t_node.m_val)>, "object cannot be moved.");
-        m_val = std::exchange(t_node.m_val, T());
-        m_left = std::exchange(t_node.m_left, nullptr);
-        m_right = std::exchange(t_node.m_right, nullptr);
-    }
-
-    TreeNode& operator=(TreeNode&&) = delete;
+template <typename T> class BSTree : public base_traits<T> {
+    using node = TreeNode<T>;
 
   public:
-    T m_val = T();
-    TreeNode* m_left;
-    TreeNode* m_right;
-};
+    BSTree() noexcept : m_root(nullptr) {}
 
-template <typename T> struct AVLNode : TreeNode<T> {
-    AVLNode() : TreeNode<T>() {}
+    template <typename U> BSTree(U&& t_val) { m_root = new_node(std::forward<U>(t_val)); }
 
-    template <typename TT,
-              typename = std::enable_if_t<!std::is_base_of_v<ITree, std::remove_reference_t<TT>>>>
-    constexpr explicit AVLNode(TT&& t_val) : TreeNode<T>(std::forward<TT>(t_val)) {}
-
-    template <typename TT>
-    constexpr AVLNode(TT&& t_val, AVLNode* t_left, AVLNode* t_right)
-        : TreeNode<T>(std::forward<TT>(t_val), t_left, t_right) {}
-
-    constexpr AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
-        m_height = std::exchange(t_node.m_height, 0);
+    ~BSTree() {
+        // удаляем ноды через post_order обход и лямбду которая удаляет ноды
+        post_order(m_root, [](auto t_node) { delete t_node; });
     }
 
-    AVLNode& operator=(AVLNode&&) = delete;
+  public:
+    template <typename U> node* new_node(U&& t_elem) const {
+        return new node(std::forward<U>(t_elem), nullptr, nullptr);
+    }
+
+    template <typename U> constexpr void insert_recursion(node*& t_root, U&& t_elem) {
+        if (t_root == nullptr) {
+            t_root = new_node(std::forward<U>(t_elem));
+            return;
+        }
+
+        if (m_root->m_val > t_elem) {
+            insert_recursion(t_root->m_left, std::forward<U>(t_elem));
+        } else {
+            insert_recursion(t_root->m_right, std::forward<U>(t_elem));
+        }
+    }
+
+    template <typename U> constexpr void insert(U&& t_elem) {
+        insert_recursion(m_root, std::forward<U>(t_elem));
+    }
+
+    template <typename Func> constexpr void post_order(node* t_root, Func t_fn) {
+        if (t_root != nullptr) {
+            post_order(t_root->m_left, t_fn);
+            post_order(t_root->m_right, t_fn);
+            t_fn(t_root);
+        }
+    }
+
+    template <typename Func> constexpr void inorder(node* t_root, Func t_fn) {
+        if (t_root != nullptr) {
+            inorder(t_root->m_left, t_fn);
+            t_fn(t_root);
+            inorder(t_root->m_right, t_fn);
+        }
+    }
+
+    void print() {
+        static_assert(std::is_arithmetic_v<T>, "arithmetic type required.");
+        post_order(m_root, [](auto t_node) { std::cout << t_node->m_val; });
+    }
+
+    constexpr node* get_root() const noexcept { return m_root; }
 
   public:
-    std::uint8_t m_height = 1;
+    node* m_root;
 };
-
 } // namespace own
 
 #endif

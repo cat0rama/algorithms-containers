@@ -14,7 +14,7 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
     using reference = T&;
     using const_pointer = const T*;
     using const_reference = const T&;
-    using cdifference_type = std::ptrdiff_t;
+    using difference_type = std::ptrdiff_t;
     using iterator_category = std::random_access_iterator_tag;
     using meta_pointer = std::conditional_t<IsIterConst, const_pointer, pointer>;
     using meta_reference = std::conditional_t<IsIterConst, const_reference, reference>;
@@ -51,33 +51,33 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
 
     constexpr meta_reference operator*() const noexcept { return *m_data; }
 
-    constexpr meta_reference operator[](cdifference_type t_index) const noexcept {
+    constexpr meta_reference operator[](difference_type t_index) const noexcept {
         return m_data[t_index];
     }
 
-    constexpr iterator& operator+=(cdifference_type t_rhs) const noexcept {
+    constexpr iterator& operator+=(difference_type t_rhs) const noexcept {
         m_data += t_rhs;
         return *this;
     }
 
-    constexpr iterator& operator-=(cdifference_type t_rhs) const noexcept {
+    constexpr iterator& operator-=(difference_type t_rhs) const noexcept {
         m_data -= t_rhs;
         return *this;
     }
 
-    constexpr iterator operator+(cdifference_type t_rhs) const noexcept {
+    constexpr iterator operator+(difference_type t_rhs) const noexcept {
         return iterator(m_data + t_rhs);
     }
 
-    constexpr iterator operator-(cdifference_type t_rhs) const noexcept {
+    constexpr iterator operator-(difference_type t_rhs) const noexcept {
         return iterator(m_data - t_rhs);
     }
 
-    friend constexpr iterator operator+(cdifference_type t_lhs, const iterator& t_rhs) noexcept {
+    friend constexpr iterator operator+(difference_type t_lhs, const iterator& t_rhs) noexcept {
         return iterator(t_lhs + t_rhs.m_data);
     }
 
-    friend constexpr iterator operator-(cdifference_type t_lhs, const iterator& t_rhs) noexcept {
+    friend constexpr iterator operator-(difference_type t_lhs, const iterator& t_rhs) noexcept {
         return iterator(t_lhs - t_rhs.m_data);
     }
 
