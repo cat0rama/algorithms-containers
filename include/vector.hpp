@@ -1,8 +1,9 @@
 #ifndef VECTOR_HPP_
 #define VECTOR_HPP_
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
-#include <type_traits>
 
 #include "defines.hpp"
 #include "iterator.hpp"
@@ -43,6 +44,11 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         std::fill(m_data, m_data + m_capacity, t_element);
     }
 
+    template <typename InputIt>
+    constexpr vector(InputIt t_first, InputIt t_last): vector(std::distance(t_first, t_last)) {
+        std::transform(t_first, t_last, std::back_inserter(*this), [](auto&& t_elem){return t_elem;});
+    }
+
     template <typename CC,
               typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<CC>>>>
     constexpr vector(CC&& t_vector) {
@@ -63,11 +69,18 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     }
 
   private:
-    template <typename Iter> void safe_cpy(Iter* t_from, Iter* t_to, std::size_t t_size) {
+    template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
+        if (t_from == nullptr) {
+            fprintf(stderr, "invalid pointer provided.\n");
+            return;
+        }
+
         try {
             std::uninitialized_copy(t_from, t_from + t_size, t_to);
         } catch (...) {
-            m_allocator.deallocate(t_to, t_size); // delete mem and call destructor
+            if (t_to) {
+                m_allocator.deallocate(t_to, t_size); // delete mem and call destructor
+            }
             THROW_FURTHER;
         }
     }
@@ -127,7 +140,7 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     }
 
     void pop_back() {
-        if (m_size <= 1) {
+        if (m_size == 0) {
             throw std::underflow_error("vector is empty.\n");
         }
         m_size--;
@@ -165,6 +178,11 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     std::size_t m_capacity;
     Allocator m_allocator;
 };
+
+// deduction hint для того чтобы вектор вывел тип от итератора
+template <typename InputIt>
+vector(InputIt t_first, InputIt t_last) -> vector<typename std::iterator_traits<InputIt>::value_type>;
+
 } // namespace own
 
 #endif

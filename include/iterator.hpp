@@ -77,6 +77,15 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
         return iterator(t_lhs + t_rhs.m_data);
     }
 
+    ////
+    friend constexpr difference_type operator+(const iterator& t_lhs, const iterator& t_rhs) noexcept {
+        return t_lhs.m_data + t_rhs.m_data;
+    }
+
+    friend constexpr difference_type operator-(const iterator& t_lhs, const iterator& t_rhs) noexcept {
+        return t_lhs.m_data - t_rhs.m_data;
+    }
+
     friend constexpr iterator operator-(difference_type t_lhs, const iterator& t_rhs) noexcept {
         return iterator(t_lhs - t_rhs.m_data);
     }

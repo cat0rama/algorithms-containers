@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <set>
+#include <list>
 
 #include "vector.hpp"
 #include "set.hpp"
@@ -57,29 +58,35 @@ int main()
 
     std::cout << d.m_val.a;*/
 
-//    vector<Test> a(10);
-//    a.push_back(Test(3));
-//    a.push_back(Test(4));
-//    a.push_back(Test(9));
+    vector<Test> a(10);
+    a.push_back(Test(3));
 
-//    vector<Test> c = a;
+    vector<Test> c = a;
 
 
-//    std::for_each(c.begin(), c.end(), [](auto l){std::cout << l.a; });
-//    std::cout << std::endl;
-//    std::for_each(a.begin(), a.end(), [](auto l){std::cout << l.a; });
+    //std::for_each(c.begin(), c.end(), [](auto l){std::cout << l.a; });
 
-    AVLNode<int> f;
+//    std::vector<int> k(10, 4);
 
-    BSTree<double> tree(3);
+    std::list<int> k = {1,2,3,4};
 
-    tree.insert(5);
-    tree.insert(2);
-    tree.insert(9);
-    tree.insert(8);
-    tree.insert(4);
+    vector l(k.begin(), k.end());
 
-    tree.erase(3);
-    tree.print();
-    std::cout << std::endl << tree.min()->m_val << std::endl;
+    l.push_back(5);
+
+    std::for_each(l.begin(), l.end(), [](auto l){std::cout << l; });
+
+//    AVLNode<int> f;
+
+//    BSTree<double> tree(3);
+
+//    tree.insert(5);
+//    tree.insert(2);
+//    tree.insert(9);
+//    tree.insert(8);
+//    tree.insert(4);
+
+//    tree.erase(3);
+//    tree.print();
+//    std::cout << std::endl << tree.min()->m_val << std::endl;
 }

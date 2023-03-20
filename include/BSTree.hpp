@@ -41,7 +41,9 @@ template <typename T> class BSTree : public base_traits<T> {
   public:
     BSTree() noexcept : m_root(nullptr) {}
 
-    template <typename U> BSTree(U&& t_val) { m_root = new_node(std::forward<U>(t_val)); }
+    template <typename U> constexpr BSTree(U&& t_val) { m_root = new_node(std::forward<U>(t_val)); }
+
+    //написать move ctor и copy ctor(операторы в том числе)
 
     virtual ~BSTree() {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
@@ -53,8 +55,8 @@ template <typename T> class BSTree : public base_traits<T> {
         return new node(std::forward<U>(t_elem), nullptr, nullptr);
     }
 
-    node* min() const {
-        auto current = m_root;
+    constexpr node* min() const noexcept {
+        node* current = m_root;
 
         while (current && current->m_left != nullptr) {
             current = current->m_left;
@@ -63,6 +65,7 @@ template <typename T> class BSTree : public base_traits<T> {
         return current;
     }
 
+    // iterative insert
     template <typename U> constexpr void insert(U&& t_elem) {
         node* new_nd = new_node(std::forward<U>(t_elem));
         node* start = m_root;
