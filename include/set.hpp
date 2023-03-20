@@ -1,7 +1,7 @@
 #ifndef SET_HPP_
 #define SET_HPP_
 
-#include "trees.hpp"
+#include "AVLTree.hpp"
 
 namespace own {
 template <typename T, typename Allocator = std::allocator<T>> class set { public: };
