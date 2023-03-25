@@ -164,7 +164,7 @@ template <typename T> class BSTree : public base_traits<T> {
     }
 
     void print() {
-        static_assert(std::is_arithmetic_v<T>, "arithmetic type required.");
+        static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
         inorder(m_root, [](auto t_node) { std::cout << t_node->m_val; });
     }
 

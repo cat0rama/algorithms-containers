@@ -74,19 +74,19 @@ int main()
 
     l.push_back(5);
 
-    std::for_each(l.begin(), l.end(), [](auto l){std::cout << l; });
+//    std::for_each(l.begin(), l.end(), [](auto l){std::cout << l; });
 
-//    AVLNode<int> f;
+    AVLNode<int> f;
 
-//    BSTree<double> tree(3);
+    BSTree<double> tree(3);
 
-//    tree.insert(5);
-//    tree.insert(2);
-//    tree.insert(9);
-//    tree.insert(8);
-//    tree.insert(4);
+    tree.insert(5);
+    tree.insert(2);
+    tree.insert(9);
+    tree.insert(8);
+    tree.insert(4);
 
-//    tree.erase(3);
-//    tree.print();
-//    std::cout << std::endl << tree.min()->m_val << std::endl;
+    tree.erase(3);
+    tree.print();
+    std::cout << std::endl << tree.min()->m_val << std::endl;
 }

@@ -150,7 +150,7 @@ template <typename It> class reverse_iterator {
     }
 
     constexpr decltype(auto) operator*() const {
-        return *current; // <== returns the content of prev
+        return *current;
     }
 
     constexpr It base() const { return current; }

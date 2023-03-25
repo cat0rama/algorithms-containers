@@ -70,9 +70,8 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
 
   private:
     template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
-        if (t_from == nullptr) {
-            fprintf(stderr, "invalid pointer provided.\n");
-            return;
+        if (!t_from || !t_to) {
+            throw std::invalid_argument("invalid iterator provided.\n");
         }
 
         try {
