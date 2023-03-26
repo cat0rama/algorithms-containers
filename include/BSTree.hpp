@@ -4,14 +4,15 @@
 #include "ITree.hpp"
 #include "traits.hpp"
 
-#include <utility>
 #include <iostream>
+#include <utility>
 
 namespace own {
 template <typename T> struct TreeNode : public INode {
     TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
 
-    template <typename TT, // диспатчу универсальную ссылку чтобы случайно не вызывался move ctor
+    template <typename TT, // диспатчу универсальную ссылку чтобы случайно не
+                           // вызывался move ctor
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
     constexpr explicit TreeNode(TT&& t_val) : m_val(std::forward<TT>(t_val)) {}
 
@@ -27,7 +28,9 @@ template <typename T> struct TreeNode : public INode {
         m_right = std::exchange(t_node.m_right, nullptr);
     }
 
+    // пока что удалены
     TreeNode& operator=(TreeNode&&) = delete;
+    TreeNode& operator=(const TreeNode&) = delete;
 
   public:
     T m_val;
@@ -37,7 +40,7 @@ template <typename T> struct TreeNode : public INode {
 
 template <typename T> class BSTree : public base_traits<T> {
     using node = TreeNode<T>;
-
+    // прописать юзинги
   public:
     BSTree() noexcept : m_root(nullptr) {}
 
@@ -55,11 +58,21 @@ template <typename T> class BSTree : public base_traits<T> {
         return new node(std::forward<U>(t_elem), nullptr, nullptr);
     }
 
-    constexpr node* min() const noexcept {
+    node* getMin() const noexcept {
         node* current = m_root;
 
         while (current && current->m_left != nullptr) {
             current = current->m_left;
+        }
+
+        return current;
+    }
+
+    node* getMax() const noexcept {
+        node* current = m_root;
+
+        while (current && current->m_right != nullptr) {
+            current = current->m_right;
         }
 
         return current;
@@ -94,7 +107,7 @@ template <typename T> class BSTree : public base_traits<T> {
         node* curr = m_root;
         node* prev = nullptr;
 
-        while(curr != nullptr && curr->m_val != t_elem) {
+        while (curr != nullptr && curr->m_val != t_elem) {
             prev = curr;
             if (t_elem < curr->m_val) {
                 curr = curr->m_left;
@@ -165,14 +178,14 @@ template <typename T> class BSTree : public base_traits<T> {
 
     void print() {
         static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
-        inorder(m_root, [](auto t_node) { std::cout << t_node->m_val; });
+        inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val; });
     }
 
     constexpr node* get_root() const noexcept { return m_root; }
 
-  private:
+  protected:
     node* m_root;
 };
-}
+} // namespace own
 
 #endif

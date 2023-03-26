@@ -45,8 +45,9 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     }
 
     template <typename InputIt>
-    constexpr vector(InputIt t_first, InputIt t_last): vector(std::distance(t_first, t_last)) {
-        std::transform(t_first, t_last, std::back_inserter(*this), [](auto&& t_elem){return t_elem;});
+    constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
+        std::transform(t_first, t_last, std::back_inserter(*this),
+                       [](auto&& t_elem) { return t_elem; });
     }
 
     template <typename CC,
@@ -180,7 +181,8 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
 
 // deduction hint для того чтобы вектор вывел тип от итератора
 template <typename InputIt>
-vector(InputIt t_first, InputIt t_last) -> vector<typename std::iterator_traits<InputIt>::value_type>;
+vector(InputIt t_first, InputIt t_last)
+    -> vector<typename std::iterator_traits<InputIt>::value_type>;
 
 } // namespace own
 

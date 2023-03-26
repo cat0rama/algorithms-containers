@@ -66,7 +66,7 @@ int main()
 
     //std::for_each(c.begin(), c.end(), [](auto l){std::cout << l.a; });
 
-//    std::vector<int> k(10, 4);
+    //std::vector<int> k(10, 4);
 
     std::list<int> k = {1,2,3,4};
 
@@ -88,5 +88,5 @@ int main()
 
     tree.erase(3);
     tree.print();
-    std::cout << std::endl << tree.min()->m_val << std::endl;
+    std::cout << std::endl << tree.getMax()->m_val << std::endl;
 }

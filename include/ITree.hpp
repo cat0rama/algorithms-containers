@@ -6,10 +6,10 @@
 namespace own {
 struct INode {
     INode() noexcept = default;
-    INode(const INode&) = delete;
-    INode& operator=(INode&&) = delete;
+    // INode(const INode&) = delete;
+    // INode& operator=(INode&&) = delete;
     virtual ~INode() = default;
 };
-}
+} // namespace own
 
 #endif

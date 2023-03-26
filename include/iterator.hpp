@@ -78,11 +78,13 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
     }
 
     ////
-    friend constexpr difference_type operator+(const iterator& t_lhs, const iterator& t_rhs) noexcept {
+    friend constexpr difference_type operator+(const iterator& t_lhs,
+                                               const iterator& t_rhs) noexcept {
         return t_lhs.m_data + t_rhs.m_data;
     }
 
-    friend constexpr difference_type operator-(const iterator& t_lhs, const iterator& t_rhs) noexcept {
+    friend constexpr difference_type operator-(const iterator& t_lhs,
+                                               const iterator& t_rhs) noexcept {
         return t_lhs.m_data - t_rhs.m_data;
     }
 
@@ -149,9 +151,7 @@ template <typename It> class reverse_iterator {
         return tmp;
     }
 
-    constexpr decltype(auto) operator*() const {
-        return *current;
-    }
+    constexpr decltype(auto) operator*() const { return *current; }
 
     constexpr It base() const { return current; }
 
