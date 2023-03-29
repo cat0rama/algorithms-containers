@@ -5,7 +5,7 @@
 
 namespace own {
 template <typename T> struct AVLNode : public TreeNode<T> {
-    AVLNode() noexcept : m_height(1), TreeNode<T>() {}
+    constexpr AVLNode() noexcept : TreeNode<T>(), m_height(DEFAULT_HEIGHT) {}
 
     template <typename TT,
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
@@ -16,12 +16,18 @@ template <typename T> struct AVLNode : public TreeNode<T> {
         : TreeNode<T>(std::forward<TT>(t_val), t_left, t_right) {}
 
     constexpr AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
-        m_height = std::exchange(t_node.m_height, 0);
+        *this = std::move(t_node);
     }
 
     // пока что удалены
-    AVLNode& operator=(AVLNode&&) = delete;    
-    AVLNode& operator=(const AVLNode&) = delete;
+    AVLNode& operator=(AVLNode&& t_node) {
+        if (this != &t_node) {
+          TreeNode::operator=(std::move(t_node));
+          m_height = std::exchange(t_node.m_height, 0);
+        }
+
+        return *this;
+    }
 
   public:
     std::uint8_t m_height;

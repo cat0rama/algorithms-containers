@@ -5,7 +5,7 @@
 
 namespace own {
 template <typename T, bool IsIterConst> struct iterator_wrapper {
-  private:
+  protected:
     using iterator = iterator_wrapper;
 
   public:
@@ -77,7 +77,6 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
         return iterator(t_lhs + t_rhs.m_data);
     }
 
-    ////
     friend constexpr difference_type operator+(const iterator& t_lhs,
                                                const iterator& t_rhs) noexcept {
         return t_lhs.m_data + t_rhs.m_data;
@@ -122,15 +121,13 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
 
 // дописать
 template <typename It> class reverse_iterator {
-  protected:
-    It current = It();
-
   public:
     reverse_iterator() = default;
-    constexpr explicit reverse_iterator(It itr) noexcept : current(itr) {}
+
+    constexpr explicit reverse_iterator(It t_it) noexcept : m_current(t_it) {}
 
     constexpr reverse_iterator& operator++() {
-        --current;
+        --m_current;
         return *this;
     }
 
@@ -141,7 +138,7 @@ template <typename It> class reverse_iterator {
     }
 
     constexpr reverse_iterator& operator--() {
-        ++current;
+        ++m_current;
         return *this;
     }
 
@@ -151,9 +148,9 @@ template <typename It> class reverse_iterator {
         return tmp;
     }
 
-    constexpr decltype(auto) operator*() const { return *current; }
+    constexpr decltype(auto) operator*() const { return *m_current; }
 
-    constexpr It base() const { return current; }
+    constexpr It base() const { return m_current; }
 
     friend constexpr bool operator==(const reverse_iterator& t_rhs,
                                      const reverse_iterator& t_lhs) noexcept {
@@ -184,6 +181,9 @@ template <typename It> class reverse_iterator {
                                      const reverse_iterator& t_lhs) noexcept {
         return t_rhs.m_data <= t_lhs.m_data;
     }
+
+  protected:
+    It m_current = It();
 };
 } // namespace own
 

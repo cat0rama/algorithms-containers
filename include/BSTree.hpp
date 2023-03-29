@@ -6,10 +6,14 @@
 
 #include <iostream>
 #include <utility>
+#include <optional>
+
+// подумать насчет конструктора от Args...
+// обернуть все в optional
 
 namespace own {
 template <typename T> struct TreeNode : public INode {
-    TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
+    constexpr TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
 
     template <typename TT, // диспатчу универсальную ссылку чтобы случайно не
                            // вызывался move ctor
@@ -21,16 +25,20 @@ template <typename T> struct TreeNode : public INode {
         : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right) {}
 
     constexpr TreeNode(TreeNode&& t_node) noexcept {
-        static_assert(std::is_move_assignable_v<decltype(t_node.m_val)>,
-                      "object cannot be moved.\n");
-        m_val = std::exchange(t_node.m_val, T());
-        m_left = std::exchange(t_node.m_left, nullptr);
-        m_right = std::exchange(t_node.m_right, nullptr);
+        *this = std::move(t_node);
     }
 
-    // пока что удалены
-    TreeNode& operator=(TreeNode&&) = delete;
-    TreeNode& operator=(const TreeNode&) = delete;
+    TreeNode& operator=(TreeNode&& t_node) {
+        if (this != &t_node) {
+            static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
+                      "object cannot be moved.\n");
+            m_val = std::exchange(t_node.m_val, T());
+            m_left = std::exchange(t_node.m_left, nullptr);
+            m_right = std::exchange(t_node.m_right, nullptr);
+        }
+
+        return *this;
+    }
 
   public:
     T m_val;
@@ -39,10 +47,16 @@ template <typename T> struct TreeNode : public INode {
 };
 
 template <typename T> class BSTree : public base_traits<T> {
+protected:
+    using base_traits<T>::value_type;
+    using base_traits<T>::pointer;
+    using base_traits<T>::reference;
+    using base_traits<T>::const_pointer;
+    using base_traits<T>::const_reference;
+    using base_traits<T>::difference_type;
     using node = TreeNode<T>;
-    // прописать юзинги
   public:
-    BSTree() noexcept : m_root(nullptr) {}
+    constexpr BSTree() noexcept : m_root(nullptr) {}
 
     template <typename U> constexpr BSTree(U&& t_val) { m_root = new_node(std::forward<U>(t_val)); }
 
@@ -56,6 +70,10 @@ template <typename T> class BSTree : public base_traits<T> {
   public:
     template <typename U> node* new_node(U&& t_elem) const {
         return new node(std::forward<U>(t_elem), nullptr, nullptr);
+    }
+    
+    template <typename... Args> node* new_node(Args... t_args) const {
+        return new node(T(std::forward<Args>(t_args)...), nullptr, nullptr);
     }
 
     node* getMin() const noexcept {
@@ -155,6 +173,7 @@ template <typename T> class BSTree : public base_traits<T> {
             } else {
                 curr->m_right = tmp->m_right;
             }
+
             curr->m_val = tmp->m_val;
             delete tmp;
         }
@@ -176,12 +195,14 @@ template <typename T> class BSTree : public base_traits<T> {
         }
     }
 
+    // проверить на наличие перегруженного оператора <<
     void print() {
+        // пока что так
         static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
         inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val; });
     }
 
-    constexpr node* get_root() const noexcept { return m_root; }
+    constexpr node* getRoot() const noexcept { return m_root; }
 
   protected:
     node* m_root;
