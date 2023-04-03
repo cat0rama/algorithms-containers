@@ -22,7 +22,7 @@ template <typename T> struct AVLNode : public TreeNode<T> {
     // пока что удалены
     AVLNode& operator=(AVLNode&& t_node) {
         if (this != &t_node) {
-          TreeNode::operator=(std::move(t_node));
+          TreeNode<T>::operator=(std::move(t_node));
           m_height = std::exchange(t_node.m_height, 0);
         }
 

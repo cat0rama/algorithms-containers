@@ -15,8 +15,8 @@ namespace own {
 template <typename T> struct TreeNode : public INode {
     constexpr TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
 
-    template <typename TT, // диспатчу универсальную ссылку чтобы случайно не
-                           // вызывался move ctor
+    template <typename TT, /* диспатчу forward reference чтобы чтобы производные классы корректно
+    могли перемещаться через move конструктор (https://godbolt.org/z/Efvj1eb1G) */
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
     constexpr explicit TreeNode(TT&& t_val) : m_val(std::forward<TT>(t_val)) {}
 
@@ -76,9 +76,8 @@ protected:
         return new node(T(std::forward<Args>(t_args)...), nullptr, nullptr);
     }
 
-    node* getMin() const noexcept {
+    const node* getMin() const noexcept {
         node* current = m_root;
-
         while (current && current->m_left != nullptr) {
             current = current->m_left;
         }
@@ -86,9 +85,8 @@ protected:
         return current;
     }
 
-    node* getMax() const noexcept {
+    const node* getMax() const noexcept {
         node* current = m_root;
-
         while (current && current->m_right != nullptr) {
             current = current->m_right;
         }

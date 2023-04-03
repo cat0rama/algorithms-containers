@@ -27,7 +27,7 @@ class Test {
      }
 
     Test(Test&& c) {
-
+        std::cout << "move";
     }
 
     Test(const Test& e) {
@@ -36,6 +36,7 @@ class Test {
 
     Test& operator=(const Test& elem) {
         a = elem.a;
+        std::cout << "move";
         return *this;
     }
 
@@ -46,18 +47,20 @@ class Test {
     }
 
      int getA() {
-         return a;
+        return a;
      }
 
      ~Test() = default;
  public:
-     int a;
+    int a;
  };
 
 int main()
 {
-    BSTree<Test> bst;
-    AVLTree<Test> dl;
+    // AVLNode<int> a;
 
-    auto node = bst.new_node(std::string("hello"), 3);
+    // AVLNode<int> l(std::move(a));
+    BSTree<int> a;
+
+    a.insert(2);
 }

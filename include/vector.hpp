@@ -102,27 +102,27 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     }
 
   public:
-    void fill(const_reference t_value) { std::fill(m_data, m_data + m_size, t_value); }
+    constexpr void fill(const_reference t_value) { std::fill(m_data, m_data + m_size, t_value); }
 
-    pointer data() const noexcept { return m_data; }
+    constexpr pointer data() const noexcept { return m_data; }
 
-    iterator begin() const noexcept { return iterator(m_data); }
+    constexpr iterator begin() const noexcept { return iterator(m_data); }
 
-    iterator end() const noexcept { return iterator(m_data + m_size); }
+    constexpr iterator end() const noexcept { return iterator(m_data + m_size); }
 
-    const_iterator cbegin() const noexcept { return const_iterator(m_data); }
+    constexpr const_iterator cbegin() const noexcept { return const_iterator(m_data); }
 
-    const_iterator cend() const noexcept { return const_iterator(m_data + m_size); }
+    constexpr const_iterator cend() const noexcept { return const_iterator(m_data + m_size); }
 
-    reverse_iterator rbegin() const noexcept { return reverse_iterator(m_data + m_size); }
+    constexpr reverse_iterator rbegin() const noexcept { return reverse_iterator(m_data + m_size); }
 
-    reverse_iterator rend() const noexcept { return reverse_iterator(m_data); }
+    constexpr reverse_iterator rend() const noexcept { return reverse_iterator(m_data); }
 
-    const_reverse_iterator crbegin() const noexcept {
+    constexpr const_reverse_iterator crbegin() const noexcept {
         return const_reverse_iterator(m_data + m_size);
     }
 
-    const_reverse_iterator crend() const noexcept { return const_reverse_iterator(m_data); }
+    constexpr const_reverse_iterator crend() const noexcept { return const_reverse_iterator(m_data); }
 
     template <typename... Args> reference emplace_back(Args&&... t_args) {
         if (m_capacity == m_size) {
@@ -163,7 +163,6 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
 
         safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);
-
         m_data = std::exchange(new_arr, nullptr);
         m_capacity = t_size;
     }
