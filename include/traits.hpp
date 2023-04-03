@@ -3,6 +3,7 @@
 
 #include <cstddef>
 
+namespace own {
 template <typename T> struct base_traits {
     using value_type = T;
     using pointer = T*;
@@ -11,5 +12,6 @@ template <typename T> struct base_traits {
     using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
 };
+}
 
 #endif

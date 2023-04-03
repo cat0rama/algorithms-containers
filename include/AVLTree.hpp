@@ -5,7 +5,7 @@
 
 namespace own {
 template <typename T> struct AVLNode : public TreeNode<T> {
-    constexpr AVLNode() noexcept : TreeNode<T>(), m_height(DEFAULT_HEIGHT) {}
+    constexpr AVLNode() noexcept : TreeNode<T>(), m_height(defines::DEFAULT_HEIGHT) {}
 
     template <typename TT,
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>

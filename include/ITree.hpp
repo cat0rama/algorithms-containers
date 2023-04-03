@@ -2,6 +2,7 @@
 #define ITREE_HPP_H
 
 #include "traits.hpp"
+#include "defines.hpp"
 
 namespace own {
 struct INode {

@@ -3,6 +3,8 @@
 
 #include <iterator>
 
+// Доделать!!!
+
 namespace own {
 template <typename T, bool IsIterConst> struct iterator_wrapper {
   protected:
@@ -119,7 +121,6 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
     meta_pointer m_data;
 };
 
-// дописать
 template <typename It> class reverse_iterator {
   public:
     reverse_iterator() = default;

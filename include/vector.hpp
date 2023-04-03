@@ -9,7 +9,7 @@
 #include "iterator.hpp"
 
 // https://en.cppreference.com/w/cpp/container/vector
-// дописать
+// ДОПИСАТЬ!
 namespace own {
 using namespace defines;
 template <class T, class Allocator = std::allocator<T>> class vector final {
@@ -44,7 +44,8 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         std::fill(m_data, m_data + m_capacity, t_element);
     }
 
-    template <typename InputIt>
+    // диспатчить итераторы чтобы не вызывалась эта перегрузка
+    template <typename InputIt, typename>
     constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
         std::transform(t_first, t_last, std::back_inserter(*this),
                        [](auto&& t_elem) { return t_elem; });

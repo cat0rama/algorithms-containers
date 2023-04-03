@@ -110,10 +110,32 @@
 //     std::cout << std::endl << tree.getMax()->m_val << std::endl;
 
 #include <gtest/gtest.h>
+#include <type_traits>
+#include <algorithm>
+#include <iostream>
 
+#include "AVLTree.hpp"
+#include "vector.hpp"
+#include "tests.hpp"
 
+using namespace own;
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, DEFAULT_CONSTRUCTOR_TEST) {
+    vector<int> vec;
+    ASSERT_EQ(vec.size(), 0);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, CONSTRUCTOR_WITH_SIZE) {
+    vector<int> vec(20, 5);
+    ASSERT_EQ(vec.size(), 20);
+}
 
 int main(int argc, char **argv) {
+    static_assert(std::is_same_v<vector<int>::const_pointer, const int*>, "Pointer(const) types are not equal.");
+    static_assert(std::is_same_v<vector<int>::pointer, int*>, "Pointer types are not equal.");
+    static_assert(std::is_same_v<vector<int>::iterator::meta_reference, int&>, "References types are not equal.");
+    static_assert(std::is_same_v<vector<int>::const_iterator::meta_reference, const int&>, "References(const) types are not equal.");
+
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

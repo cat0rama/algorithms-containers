@@ -13,3 +13,5 @@ add_executable(${PROJECT_NAME} tests.cpp)
 target_link_libraries(${PROJECT_NAME} gtest gtest_main)
 
 add_test(${PROJECT_NAME} ${PROJECT_NAME})
+
+include_directories(../include PRIVATE)
