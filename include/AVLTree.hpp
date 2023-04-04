@@ -19,11 +19,10 @@ template <typename T> struct AVLNode : public TreeNode<T> {
         *this = std::move(t_node);
     }
 
-    // пока что удалены
     AVLNode& operator=(AVLNode&& t_node) {
         if (this != &t_node) {
-          TreeNode<T>::operator=(std::move(t_node));
-          m_height = std::exchange(t_node.m_height, 0);
+            TreeNode<T>::operator=(std::move(t_node));
+            m_height = std::exchange(t_node.m_height, 0);
         }
 
         return *this;
@@ -41,9 +40,7 @@ template <typename T> class AVLTree : public BSTree<T> {
 
     // написать конструктор копирования и перемещения
   public:
-
   protected:
-  
 };
 
 } // namespace own

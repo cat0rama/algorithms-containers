@@ -117,13 +117,13 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
         return t_rhs.m_data <= t_lhs.m_data;
     }
 
-  private:
+  protected:
     meta_pointer m_data;
 };
 
 template <typename It> class reverse_iterator {
   public:
-    reverse_iterator() = default;
+    reverse_iterator() : m_current(It()) {}
 
     constexpr explicit reverse_iterator(It t_it) noexcept : m_current(t_it) {}
 
@@ -165,26 +165,26 @@ template <typename It> class reverse_iterator {
 
     friend constexpr bool operator>(const reverse_iterator& t_rhs,
                                     const reverse_iterator& t_lhs) noexcept {
-        return t_rhs.m_data > t_lhs.m_data;
+        return t_rhs.base() > t_lhs.base();
     }
 
     friend constexpr bool operator<(const reverse_iterator& t_rhs,
                                     const reverse_iterator& t_lhs) noexcept {
-        return t_rhs.m_data < t_lhs.m_data;
+        return t_rhs.base() < t_lhs.base();
     }
 
     friend constexpr bool operator>=(const reverse_iterator& t_rhs,
                                      const reverse_iterator& t_lhs) noexcept {
-        return t_rhs.m_data >= t_lhs.m_data;
+        return t_rhs.base() >= t_lhs.base();
     }
 
     friend constexpr bool operator<=(const reverse_iterator& t_rhs,
                                      const reverse_iterator& t_lhs) noexcept {
-        return t_rhs.m_data <= t_lhs.m_data;
+        return t_rhs.base() <= t_lhs.base();
     }
 
   protected:
-    It m_current = It();
+    It m_current;
 };
 } // namespace own
 

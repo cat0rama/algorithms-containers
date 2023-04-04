@@ -12,7 +12,7 @@
 // ДОПИСАТЬ!
 namespace own {
 using namespace defines;
-template <class T, class Allocator = std::allocator<T>> class vector final {
+template <typename T, typename Allocator = std::allocator<T>> class vector final {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -41,14 +41,21 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
     constexpr vector(std::size_t t_size, const_reference t_element)
         : m_size(t_size), m_capacity(t_size * FACTOR) {
         m_data = m_allocator.allocate(m_capacity);
-        std::fill(m_data, m_data + m_capacity, t_element);
+        fill(t_element);
     }
 
-    // диспатчить итераторы чтобы не вызывалась эта перегрузка
-    template <typename InputIt, typename>
+    constexpr vector(const std::initializer_list<T>& t_list)
+        : vector(std::distance(t_list.begin(), t_list.end())) {
+        std::transform(t_list.begin(), t_list.end(), std::back_inserter(*this),
+                    [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
+    }
+
+    // диспатчу конструктор на признак итератора
+    template <typename InputIt, typename = std::enable_if_t<is_iterator<InputIt>>>
     constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
         std::transform(t_first, t_last, std::back_inserter(*this),
-                       [](auto&& t_elem) { return t_elem; });
+        // Если не форвардить обьект, то будет вызываться лишний консутрктор копирования
+                    [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
     }
 
     template <typename CC,
@@ -101,11 +108,28 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
             std::swap(m_allocator, t_vector.m_allocator);
         }
     }
-
   public:
-    constexpr void fill(const_reference t_value) { std::fill(m_data, m_data + m_size, t_value); }
+    constexpr const T& at(std::size_t t_i) const {
+        if (t_i >= m_size) {
+            throw std::out_of_range("index out of range.\n");
+        }
 
-    constexpr pointer data() const noexcept { return m_data; }
+        return m_data[t_i];
+    }
+
+    constexpr T& at(std::size_t t_i) {
+        if (t_i >= m_size) {
+            throw std::out_of_range("index out of range.\n");
+        }
+
+        return m_data[t_i];
+    }
+    
+    constexpr void fill(const_reference t_value) { std::fill(begin(), end(), t_value); }
+
+    constexpr pointer data() noexcept { return m_data; }
+
+    constexpr const_pointer data() const noexcept { return m_data; }
 
     constexpr iterator begin() const noexcept { return iterator(m_data); }
 
@@ -123,13 +147,15 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         return const_reverse_iterator(m_data + m_size);
     }
 
-    constexpr const_reverse_iterator crend() const noexcept { return const_reverse_iterator(m_data); }
+    constexpr const_reverse_iterator crend() const noexcept {
+        return const_reverse_iterator(m_data);
+    }
 
     template <typename... Args> reference emplace_back(Args&&... t_args) {
         if (m_capacity == m_size) {
             reserve(m_size * FACTOR);
         }
-        // don't use allocator.construct for practice with placement new.
+        // не использую allocator.construct для практики с new placement
         return *new (m_data + m_size++) T(std::forward<Args>(t_args)...);
     }
 
@@ -144,8 +170,7 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
         if (m_size == 0) {
             throw std::underflow_error("vector is empty.\n");
         }
-        m_size--;
-        (m_data + m_size)->~T();
+        (m_data + --m_size)->~T();
     }
 
     void resize(std::size_t t_size) {
@@ -160,7 +185,7 @@ template <class T, class Allocator = std::allocator<T>> class vector final {
             return;
         }
         auto new_arr =
-            m_allocator.allocate(t_size); // allocate memory without call default constructor
+            m_allocator.allocate(t_size); // выделяю память без вызова конструктора(raw mem)
 
         safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);

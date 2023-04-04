@@ -5,8 +5,8 @@
 #include "traits.hpp"
 
 #include <iostream>
-#include <utility>
 #include <optional>
+#include <utility>
 
 // подумать насчет конструктора от Args...
 // обернуть все в optional
@@ -24,14 +24,12 @@ template <typename T> struct TreeNode : public INode {
     constexpr TreeNode(TT&& t_val, TreeNode* t_left, TreeNode* t_right)
         : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right) {}
 
-    constexpr TreeNode(TreeNode&& t_node) noexcept {
-        *this = std::move(t_node);
-    }
+    constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
 
     TreeNode& operator=(TreeNode&& t_node) {
         if (this != &t_node) {
             static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
-                      "object cannot be moved.\n");
+                          "object cannot be moved.\n");
             m_val = std::exchange(t_node.m_val, T());
             m_left = std::exchange(t_node.m_left, nullptr);
             m_right = std::exchange(t_node.m_right, nullptr);
@@ -47,7 +45,7 @@ template <typename T> struct TreeNode : public INode {
 };
 
 template <typename T> class BSTree : public base_traits<T> {
-protected:
+  protected:
     using base_traits<T>::value_type;
     using base_traits<T>::pointer;
     using base_traits<T>::reference;
@@ -55,6 +53,7 @@ protected:
     using base_traits<T>::const_reference;
     using base_traits<T>::difference_type;
     using node = TreeNode<T>;
+
   public:
     constexpr BSTree() noexcept : m_root(nullptr) {}
 
@@ -71,7 +70,7 @@ protected:
     template <typename U> node* new_node(U&& t_elem) const {
         return new node(std::forward<U>(t_elem), nullptr, nullptr);
     }
-    
+
     template <typename... Args> node* new_node(Args... t_args) const {
         return new node(T(std::forward<Args>(t_args)...), nullptr, nullptr);
     }

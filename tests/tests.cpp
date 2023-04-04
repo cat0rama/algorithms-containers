@@ -113,6 +113,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "AVLTree.hpp"
 #include "vector.hpp"
@@ -122,12 +123,39 @@ using namespace own;
 
 TEST(VECTOR_CONSTRUCTOR_TESTS, DEFAULT_CONSTRUCTOR_TEST) {
     vector<int> vec;
-    ASSERT_EQ(vec.size(), 0);
+    EXPECT_EQ(vec.size(), 0);
+    EXPECT_EQ(vec.capacity(), DEFAULT_CAPACITY);
 }
 
 TEST(VECTOR_CONSTRUCTOR_TESTS, CONSTRUCTOR_WITH_SIZE) {
-    vector<int> vec(20, 5);
-    ASSERT_EQ(vec.size(), 20);
+    vector<int> vec2(50);
+
+    EXPECT_EQ(vec2.size(), 0);
+    EXPECT_EQ(vec2.capacity(), 50 * FACTOR);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, CONSTRUCT_WITH_FILL_ELEMENTS) {
+    vector<int> vec2(50, 50);
+
+    EXPECT_EQ(vec2.size(), 50);
+    EXPECT_EQ(vec2.capacity(), 50 * FACTOR);
+    EXPECT_EQ(vec2.at(45), 50);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, INITIALIZER_CONSTRUCTOR) {
+    vector<int> vec = {1, 2, 3, 4};
+    std::vector<int> vec2 = {1, 2, 3, 4};
+
+    EXPECT_EQ(vec.size(), 4);
+    EXPECT_EQ(vec.capacity(), 4 * FACTOR);
+
+    auto res1 = std::equal(vec.begin(), vec.end(), vec2.begin());
+    ASSERT_EQ(res1, true);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, ITERATOR_CONSTRUCTOR) {
+    vector<::Test> low = {::Test(3), ::Test(4)};
+
 }
 
 int main(int argc, char **argv) {

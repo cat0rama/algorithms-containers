@@ -1,8 +1,8 @@
 #ifndef ITREE_HPP_H
 #define ITREE_HPP_H
 
-#include "traits.hpp"
 #include "defines.hpp"
+#include "traits.hpp"
 
 namespace own {
 struct INode {
