@@ -14,13 +14,23 @@ template <typename T> struct base_traits {
     using difference_type = std::ptrdiff_t;
 };
 
-template <class T, class = void>
-struct is_iterator : std::false_type { };
+template<typename T, typename = void>
+struct is_iterator
+        {
+        static constexpr bool value = false;
+    };
 
-template <class T>
-struct is_iterator<T, std::void_t<
-    typename std::iterator_traits<T>::iterator_category
->> : std::true_type { };
+    template<typename T>
+    struct is_iterator<T, typename std::enable_if
+            <!std::is_same<typename std::iterator_traits<T>::value_type, void>::value>::type>
+    {
+        static constexpr bool value = true;
+    };
+
+    template <typename T>
+    struct is_iterator_v {
+        static constexpr bool value = is_iterator<T>::value;
+    };
 
 } // namespace own
 

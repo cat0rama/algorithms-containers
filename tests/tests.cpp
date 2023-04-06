@@ -154,8 +154,12 @@ TEST(VECTOR_CONSTRUCTOR_TESTS, INITIALIZER_CONSTRUCTOR) {
 }
 
 TEST(VECTOR_CONSTRUCTOR_TESTS, ITERATOR_CONSTRUCTOR) {
-    vector<::Test> low = {::Test(3), ::Test(4)};
+    vector<int> vec = {1,2,3,4,5};
 
+    vector vec3(vec.begin(), vec.end());
+
+    EXPECT_EQ(vec3.size(), 5);
+    EXPECT_EQ(vec3.capacity(), 10);
 }
 
 int main(int argc, char **argv) {

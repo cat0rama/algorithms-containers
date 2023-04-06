@@ -5,6 +5,7 @@
 #include <iterator>
 #include <memory>
 
+#include "traits.hpp"
 #include "defines.hpp"
 #include "iterator.hpp"
 
@@ -47,20 +48,24 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
     constexpr vector(const std::initializer_list<T>& t_list)
         : vector(std::distance(t_list.begin(), t_list.end())) {
         std::transform(t_list.begin(), t_list.end(), std::back_inserter(*this),
-                    [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
+                       [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
     }
 
-    // диспатчу конструктор на признак итератора
-    template <typename InputIt, typename = std::enable_if_t<is_iterator<InputIt>>>
+    // проверяю тип на итератор при помощи неявного преобразования InputIt к категории итератора.
+    template <typename InputIt, typename =
+            std::enable_if_t<std::is_convertible<typename
+            std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
     constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
-        std::transform(t_first, t_last, std::back_inserter(*this),
-        // Если не форвардить обьект, то будет вызываться лишний консутрктор копирования
-                    [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
+        std::transform(
+            t_first, t_last, std::back_inserter(*this),
+            // Если не форвардить обьект, то будет вызываться лишний консутрктор копирования
+            // https://godbolt.org/z/9Kj48r5ab
+            [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
     }
 
     template <typename CC,
               typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<CC>>>>
-    constexpr vector(CC&& t_vector) {
+    constexpr explicit vector(CC&& t_vector) {
         Initialize(std::forward<CC>(t_vector));
     }
 
@@ -77,6 +82,21 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
         return *this;
     }
 
+    const_reference operator[](size_type t_i) const {
+        if (t_i >= m_size) {
+            throw std::out_of_range("index out of range.\n");
+        }
+
+        return m_data[t_i];
+    }
+
+    reference operator[](size_type t_i) {
+        if (t_i >= m_size) {
+            throw std::out_of_range("index out of range.\n");
+        }
+
+        return m_data[t_i];
+    }
   private:
     template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
         if (!t_from || !t_to) {
@@ -108,12 +128,12 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
             std::swap(m_allocator, t_vector.m_allocator);
         }
     }
+
   public:
     constexpr const T& at(std::size_t t_i) const {
         if (t_i >= m_size) {
             throw std::out_of_range("index out of range.\n");
         }
-
         return m_data[t_i];
     }
 
@@ -121,10 +141,9 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
         if (t_i >= m_size) {
             throw std::out_of_range("index out of range.\n");
         }
-
         return m_data[t_i];
     }
-    
+
     constexpr void fill(const_reference t_value) { std::fill(begin(), end(), t_value); }
 
     constexpr pointer data() noexcept { return m_data; }
@@ -193,9 +212,19 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
         m_capacity = t_size;
     }
 
-    constexpr std::size_t size() const noexcept { return m_size; }
+    [[nodiscard]] constexpr reference back() { return m_data[m_size - 1]; }
 
-    constexpr std::size_t capacity() const noexcept { return m_capacity; }
+    [[nodiscard]] constexpr reference front() { return m_data[0]; }
+
+    [[nodiscard]] constexpr const_reference back() const { return m_data[m_size - 1]; }
+
+    [[nodiscard]] constexpr const_reference front() const { return m_data[0]; }
+
+    [[nodiscard]] constexpr std::size_t size() const noexcept { return m_size; }
+
+    [[nodiscard]] constexpr std::size_t capacity() const noexcept { return m_capacity; }
+
+    [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
   private:
     pointer m_data;

@@ -17,7 +17,7 @@ class Test {
 
     Test(int _a): a(_a) {
          a = _a;
-     }
+    }
 
     Test(Test&& c) {
         std::cout << "move";

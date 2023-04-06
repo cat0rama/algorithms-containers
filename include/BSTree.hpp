@@ -26,7 +26,7 @@ template <typename T> struct TreeNode : public INode {
 
     constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
 
-    TreeNode& operator=(TreeNode&& t_node) {
+    TreeNode& operator=(TreeNode&& t_node) noexcept {
         if (this != &t_node) {
             static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
                           "object cannot be moved.\n");

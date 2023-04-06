@@ -19,7 +19,7 @@ template <typename T> struct AVLNode : public TreeNode<T> {
         *this = std::move(t_node);
     }
 
-    AVLNode& operator=(AVLNode&& t_node) {
+    AVLNode& operator=(AVLNode&& t_node) noexcept {
         if (this != &t_node) {
             TreeNode<T>::operator=(std::move(t_node));
             m_height = std::exchange(t_node.m_height, 0);

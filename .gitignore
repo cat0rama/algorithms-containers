@@ -3,6 +3,8 @@
 .vscode
 *build
 *.vs
+*.idea
+*cmake
 # Compiled Object files
 *.slo
 *.lo

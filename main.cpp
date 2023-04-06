@@ -12,10 +12,6 @@
 
 using namespace own;
 
-int main()
-{
-    // AVLNode<int> a;
-
-    // AVLNode<int> l(std::move(a));
-    BSTree<int> a;
+int main() {
+    std::cout << "hello world" << std::endl;
 }
