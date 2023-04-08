@@ -162,6 +162,35 @@ TEST(VECTOR_CONSTRUCTOR_TESTS, ITERATOR_CONSTRUCTOR) {
     EXPECT_EQ(vec3.capacity(), 10);
 }
 
+TEST(VECTOR_CONSTRUCTOR_TESTS, COPY_CONSTRUCTOR_AND_OPERATOR) {
+    ::Test l(43);
+    vector<::Test> test = {::Test(1), l};
+    decltype(test) test2;
+
+    test2 = test;
+
+    ASSERT_EQ(test[0].a, 1);
+    ASSERT_EQ(test[1].a, 43);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, MOVE_CONSTRUCTOR_AND_OPERATOR) {
+    vector<int> test(vector<int>(10, 5));
+
+    test = vector(vector({1,2,3,4,5}));
+
+    ASSERT_EQ(test[4], 5);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, INDEX_OPERATOR_TEST) {
+    vector<int> vec = {1,2,3,4,5,6};
+
+    EXPECT_THROW(vec[75], std::out_of_range);
+}
+
+TEST(VECTOR_CONSTRUCTOR_TESTS, SAFE_CPY_TEST) {
+
+}
+
 int main(int argc, char **argv) {
     static_assert(std::is_same_v<vector<int>::const_pointer, const int*>, "Pointer(const) types are not equal.");
     static_assert(std::is_same_v<vector<int>::pointer, int*>, "Pointer types are not equal.");

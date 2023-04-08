@@ -4,7 +4,7 @@
 *build
 *.vs
 *.idea
-*cmake
+cmake*
 # Compiled Object files
 *.slo
 *.lo

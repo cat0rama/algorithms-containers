@@ -4,7 +4,19 @@
 #include <cstdint>
 #include <type_traits>
 
+#define SWITCH_MODIFIRE  // потом сделать через флаг в cmake
+
 #define THROW_FURTHER throw
+
+/*
+ * дефайн для того чтобы в тестах можно было унаследоваться от класса
+ * и получить доступ к его приватным функциям
+*/
+#ifdef SWITCH_MODIFIRE
+#define MODIFIRE protected
+#else
+#define MODIFIRE private
+#endif
 
 namespace own::defines {
 constexpr int DEFAULT_HEIGHT = 1;

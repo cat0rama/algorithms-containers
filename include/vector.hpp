@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <limits>
 
 #include "traits.hpp"
 #include "defines.hpp"
@@ -97,7 +98,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
 
         return m_data[t_i];
     }
-  private:
+MODIFIRE:
     template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
         if (!t_from || !t_to) {
             throw std::invalid_argument("invalid iterator provided.\n");
@@ -170,6 +171,12 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
         return const_reverse_iterator(m_data);
     }
 
+    [[nodiscard]] constexpr size_t max_size() const noexcept {
+        // тк аллокатор выделяет память, надо брать значения у него
+        return m_allocator.max_size();
+        // вычисляется по (2^SYS_BITS)/SIZE_TYPE - 1
+    }
+
     template <typename... Args> reference emplace_back(Args&&... t_args) {
         if (m_capacity == m_size) {
             reserve(m_size * FACTOR);
@@ -200,9 +207,6 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
     }
 
     void reserve(std::size_t t_size) {
-        if (m_capacity >= t_size) {
-            return;
-        }
         auto new_arr =
             m_allocator.allocate(t_size); // выделяю память без вызова конструктора(raw mem)
 
@@ -210,6 +214,11 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
         m_allocator.deallocate(m_data, m_capacity);
         m_data = std::exchange(new_arr, nullptr);
         m_capacity = t_size;
+    }
+
+    void shrink_to_fit() {
+        // пока что так
+        reserve(m_size);
     }
 
     [[nodiscard]] constexpr reference back() { return m_data[m_size - 1]; }
@@ -226,7 +235,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
 
     [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
-  private:
+MODIFIRE:
     pointer m_data;
     std::size_t m_size;
     std::size_t m_capacity;

@@ -2,6 +2,7 @@
 #define TESTS_HPP_
 
 #include <iostream>
+#include <exception>
 
 // Тестовый класс
 
@@ -20,6 +21,7 @@ class Test {
     }
 
     Test(Test&& c) {
+        a = c.a;
         std::cout << "move";
     }
 
@@ -46,6 +48,69 @@ class Test {
      ~Test() = default;
  public:
     int a;
+};
+
+class ExceptionTest {
+public:
+    ExceptionTest() {
+        std::cout << "construct" << std::endl;
+    }
+
+    ExceptionTest(std::string, int) {
+        std::cout << "string:int" << std::endl;
+    }
+
+    ExceptionTest(int _a): a(_a) {
+        a = _a;
+    }
+
+    ExceptionTest(ExceptionTest&& c) {
+        a = c.a;
+        std::cout << "move";
+        throw std::exception("this is sparta!");
+    }
+
+    ExceptionTest(const ExceptionTest& e) {
+        a = e.a;
+        throw std::exception("this is sparta!");
+    };
+
+    ExceptionTest& operator=(const ExceptionTest& elem) {
+        a = elem.a;
+        std::cout << "move";
+        throw std::exception("this is sparta!");
+        return *this;
+    }
+
+    ExceptionTest& operator=(ExceptionTest&&) {
+        throw std::exception("this is sparta!");
+        return *this;
+    };
+
+    friend bool operator>(const ExceptionTest& a, const ExceptionTest& b) {
+        return a.a > b.a;
+    }
+
+    int getA() {
+        return a;
+    }
+
+    ~ExceptionTest() = default;
+public:
+    int a;
+};
+
+// Класс для проверки приватных членов тестируемого класса
+template <typename T>
+class TestOther : public T {
+public:
+    TestOther() = default;
+
+    ~TestOther() = default;
+public:
+    void im() const noexcept {
+        std::cout << "im TestOther" << std::endl;
+    }
 };
 
 #endif
