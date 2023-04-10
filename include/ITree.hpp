@@ -4,6 +4,8 @@
 #include "defines.hpp"
 #include "traits.hpp"
 
+// Абстрактный класс ноды для построения иерархии
+
 namespace own {
 struct INode {
     INode() noexcept = default;

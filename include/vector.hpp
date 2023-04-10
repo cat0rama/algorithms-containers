@@ -3,18 +3,19 @@
 
 #include <algorithm>
 #include <iterator>
-#include <memory>
 #include <limits>
+#include <memory>
 
-#include "traits.hpp"
 #include "defines.hpp"
 #include "iterator.hpp"
+#include "traits.hpp"
 
 // https://en.cppreference.com/w/cpp/container/vector
 // ДОПИСАТЬ!
 namespace own {
+//пока что убрал final(для тестов), потом надо будет вернуть на место
 using namespace defines;
-template <typename T, typename Allocator = std::allocator<T>> class vector final {
+template <typename T, typename Allocator = std::allocator<T>> class vector {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -53,15 +54,14 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
     }
 
     // проверяю тип на итератор при помощи неявного преобразования InputIt к категории итератора.
-    template <typename InputIt, typename =
-            std::enable_if_t<std::is_convertible<typename
-            std::iterator_traits<InputIt>::iterator_category, std::input_iterator_tag>::value>>
+    template <typename InputIt, typename = std::enable_if_t<std::is_convertible<
+                                    typename std::iterator_traits<InputIt>::iterator_category,
+                                    std::input_iterator_tag>::value>>
     constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
-        std::transform(
-            t_first, t_last, std::back_inserter(*this),
-            // Если не форвардить обьект, то будет вызываться лишний консутрктор копирования
-            // https://godbolt.org/z/9Kj48r5ab
-            [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
+        std::transform(t_first, t_last, std::back_inserter(*this),
+                       // Если не форвардить обьект, то будет вызываться лишний консутрктор
+                       // копирования https://godbolt.org/z/9Kj48r5ab
+                       [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
     }
 
     template <typename CC,
@@ -98,8 +98,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector final
 
         return m_data[t_i];
     }
-MODIFIRE:
-    template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
+    MODIFIRE : template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
         if (!t_from || !t_to) {
             throw std::invalid_argument("invalid iterator provided.\n");
         }
@@ -108,7 +107,8 @@ MODIFIRE:
             std::uninitialized_copy(t_from, t_from + t_size, t_to);
         } catch (...) {
             if (t_to) {
-                m_allocator.deallocate(t_to, t_size); // delete mem and call destructor
+                // удаляю память через deallocate, который вызовет деструкторы у обьектов
+                m_allocator.deallocate(t_to, t_size);
             }
             THROW_FURTHER;
         }
@@ -174,7 +174,10 @@ MODIFIRE:
     [[nodiscard]] constexpr size_t max_size() const noexcept {
         // тк аллокатор выделяет память, надо брать значения у него
         return m_allocator.max_size();
-        // вычисляется по (2^SYS_BITS)/SIZE_TYPE - 1
+        /* вычисляется по формуле: (2^SYS_BITS)/SIZE_TYPE - 1 где:
+         * SYS_BITS - это битность OC
+         * SIZE_TYPE - это размер типа, размером с который выделяется память
+         */
     }
 
     template <typename... Args> reference emplace_back(Args&&... t_args) {
@@ -207,8 +210,8 @@ MODIFIRE:
     }
 
     void reserve(std::size_t t_size) {
-        auto new_arr =
-            m_allocator.allocate(t_size); // выделяю память без вызова конструктора(raw mem)
+        // выделяю память без вызова конструктора(raw mem)
+        auto new_arr = m_allocator.allocate(t_size);
 
         safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);
@@ -235,8 +238,7 @@ MODIFIRE:
 
     [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
-MODIFIRE:
-    pointer m_data;
+    MODIFIRE : pointer m_data;
     std::size_t m_size;
     std::size_t m_capacity;
     Allocator m_allocator;

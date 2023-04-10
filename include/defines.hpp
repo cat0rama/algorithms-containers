@@ -4,16 +4,17 @@
 #include <cstdint>
 #include <type_traits>
 
-#define SWITCH_MODIFIRE  // потом сделать через флаг в cmake
+#define SWITCH_MODIFIRE // потом сделать через флаг в cmake
 
 #define THROW_FURTHER throw
 
 /*
  * дефайн для того чтобы в тестах можно было унаследоваться от класса
- * и получить доступ к его приватным функциям
-*/
+ * и получить доступ к его приватным функциям и членам
+ */
+
 #ifdef SWITCH_MODIFIRE
-#define MODIFIRE protected
+#define MODIFIRE public
 #else
 #define MODIFIRE private
 #endif

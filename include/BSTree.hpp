@@ -71,7 +71,7 @@ template <typename T> class BSTree : public base_traits<T> {
         return new node(std::forward<U>(t_elem), nullptr, nullptr);
     }
 
-    template <typename... Args> node* new_node(Args... t_args) const {
+    template <typename... Args> node* construct_node(Args... t_args) const {
         return new node(T(std::forward<Args>(t_args)...), nullptr, nullptr);
     }
 

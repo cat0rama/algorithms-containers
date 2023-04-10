@@ -7,7 +7,7 @@ SRC_PATH=src
 all: clean s21_containers.a
 
 test: clean
-	$(CC) $(CFLAGS) *.cpp tests/tests.cpp -lgtest
+	$(CC) $(CFLAGS) tests/tests.cpp -lgtest
 	./a.out
 
 clean:

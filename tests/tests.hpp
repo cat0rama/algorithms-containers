@@ -4,7 +4,7 @@
 #include <iostream>
 #include <exception>
 
-// Тестовый класс
+// Тестовые классы
 
 class Test {
  public:
@@ -86,6 +86,10 @@ public:
         throw std::exception("this is sparta!");
         return *this;
     };
+
+    friend bool operator==(const ExceptionTest& a, const ExceptionTest& b) {
+        return a.a == b.a;
+    }
 
     friend bool operator>(const ExceptionTest& a, const ExceptionTest& b) {
         return a.a > b.a;
