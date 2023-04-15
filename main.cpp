@@ -14,14 +14,26 @@
 using namespace own;
 
 int main() {
-    int a = 4;
-    BSTree<int> tree = {1,2,3, a};
+//    int a = 4;
+//    BSTree<int> tree = {1,2,3, a};
+//
+//    tree.insert(3);
+//    tree.insert(5);
+//    tree.insert(8);
+//
+//    BSTree<int> tree2(tree);
+//
+//    tree2 = BSTree<int>{1,2,3};
+//
+//    tree2 = tree;
+//
+//    tree2.print();
 
-    tree.insert(3);
-    tree.insert(5);
-    tree.insert(8);
+    BSTree<int>* ptr = new AVLTree<int>;
 
-    BSTree<int> tree2(tree);
+    ptr->insert(3);
+    ptr->insert(3);
+    ptr->print();
 
-    tree2.print();
+    delete ptr;
 }

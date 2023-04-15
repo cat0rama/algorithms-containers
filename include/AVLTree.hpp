@@ -34,13 +34,25 @@ template <typename T> struct AVLNode : public TreeNode<T> {
 
 template <typename T> class AVLTree : public BSTree<T> {
   public:
-    AVLTree() noexcept : BSTree<T>() {}
+    constexpr AVLTree() noexcept : BSTree<T>() {}
 
-    template <typename U> AVLTree(U&& t_val) : BSTree<T>(std::forward<U>(t_val)) {}
+    constexpr AVLTree(const std::initializer_list<T>& t_list): BSTree<T>(t_list) {}
 
-    // написать конструктор копирования и перемещения
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree<T>, std::remove_reference_t<U>>>>
+    explicit AVLTree(U&& t_tree) {}
+
+    virtual ~AVLTree() {}
   public:
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree<T>, std::remove_reference_t<U>>>>
+    AVLTree<T>& operator=(U&& t_tree) {
+        if (this != &t_tree) {
+            BSTree<T>::operator=(t_tree);
+        }
+
+        return *this;
+    }
   protected:
+    //std::size_t m_hight;
 };
 
 } // namespace own

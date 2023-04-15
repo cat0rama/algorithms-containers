@@ -106,10 +106,9 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         try {
             std::uninitialized_copy(t_from, t_from + t_size, t_to);
         } catch (...) {
-            if (t_to) {
-                // удаляю память через deallocate, который вызовет деструкторы у обьектов
-                m_allocator.deallocate(t_to, t_size);
-            }
+            // удаляю память через deallocate, который вызовет деструкторы у обьектов
+            m_allocator.deallocate(t_to, t_size);
+
             THROW_FURTHER;
         }
     }

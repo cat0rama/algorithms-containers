@@ -9,8 +9,6 @@
 #include <type_traits>
 #include <algorithm>
 
-// подумать насчет конструктора от Args...
-
 namespace own {
 template <typename T> struct TreeNode : public INode {
     constexpr TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
@@ -70,12 +68,24 @@ template <typename T> class BSTree : public base_traits<T> {
 
     virtual ~BSTree() {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
-        post_order(m_root, [](auto& t_node) { delete t_node; });
+        destroy();
     }
 
   public:
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree, std::remove_reference_t<U>>>>
+    BSTree<T>& operator=(U&& t_tree) {
+        if (this != &t_tree) {
+            destroy();
+            initialize(std::forward<U>(t_tree));
+        }
 
-  protected:
+        return *this;
+    }
+protected:
+    void destroy() noexcept {
+        post_order(m_root, [](auto& t_node) { delete t_node; });
+    }
+
     template <typename Y>
     constexpr void initialize(Y&& t_tree) noexcept(!std::is_lvalue_reference_v<Y>) {
         if constexpr (std::is_lvalue_reference_v<Y>) {
@@ -94,7 +104,7 @@ template <typename T> class BSTree : public base_traits<T> {
         return new node(T(std::forward<Args>(t_args)...));
     }
 
-    const node* get_min() const noexcept {
+    [[nodiscard]] const node* get_min() const noexcept {
         node* current = m_root;
         while (current && current->m_left != nullptr) {
             current = current->m_left;
@@ -103,7 +113,7 @@ template <typename T> class BSTree : public base_traits<T> {
         return current;
     }
 
-    const node* get_max() const noexcept {
+    [[nodiscard]] const node* get_max() const noexcept {
         node* current = m_root;
         while (current && current->m_right != nullptr) {
             current = current->m_right;
@@ -113,7 +123,7 @@ template <typename T> class BSTree : public base_traits<T> {
     }
 
     // iterative insert
-    template <typename U> constexpr void insert(U&& t_elem) {
+    template <typename U> void insert(U&& t_elem) {
         node* new_nd = new_node(std::forward<U>(t_elem));
 
         if (m_root == nullptr) {
@@ -236,7 +246,7 @@ template <typename T> class BSTree : public base_traits<T> {
         inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
     }
 
-    constexpr node* getRoot() const noexcept { return m_root; }
+    [[nodiscard]] constexpr node* getRoot() const noexcept { return m_root; }
 
   MODIFIRE:
     node* m_root = nullptr;
