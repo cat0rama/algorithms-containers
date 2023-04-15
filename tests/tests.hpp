@@ -41,11 +41,17 @@ class Test {
         return a.a > b.a;
     }
 
+    friend bool operator<(const Test& a, const Test& b) {
+        return a.a < b.a;
+    }
+
      int getA() {
         return a;
      }
 
-     ~Test() = default;
+     ~Test()  {
+        std::cout << "destructor" << std::endl;
+    }
  public:
     int a;
 };
@@ -67,23 +73,23 @@ public:
     ExceptionTest(ExceptionTest&& c) {
         a = c.a;
         std::cout << "move";
-        throw std::exception("this is sparta!");
+        //throw std::exception("this is sparta!");
     }
 
     ExceptionTest(const ExceptionTest& e) {
         a = e.a;
-        throw std::exception("this is sparta!");
+        //throw std::exception("this is sparta!");
     };
 
     ExceptionTest& operator=(const ExceptionTest& elem) {
         a = elem.a;
         std::cout << "move";
-        throw std::exception("this is sparta!");
+        //throw std::exception("this is sparta!");
         return *this;
     }
 
     ExceptionTest& operator=(ExceptionTest&&) {
-        throw std::exception("this is sparta!");
+        //throw std::exception("this is sparta!");
         return *this;
     };
 
@@ -104,7 +110,7 @@ public:
     int a;
 };
 
-// Класс для проверки приватных членов тестируемого класса
+// Класс для проверки приватных функций тестируемого класса
 template <typename T>
 class TestOther : public T {
 public:

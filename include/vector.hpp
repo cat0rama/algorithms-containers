@@ -67,7 +67,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     template <typename CC,
               typename = std::enable_if_t<std::is_same_v<vector, std::remove_reference_t<CC>>>>
     constexpr explicit vector(CC&& t_vector) {
-        Initialize(std::forward<CC>(t_vector));
+        initialize(std::forward<CC>(t_vector));
     }
 
     ~vector() { m_allocator.deallocate(m_data, m_capacity); }
@@ -78,7 +78,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     constexpr vector& operator=(TT&& t_vector) {
         if (this != &t_vector) {
             m_allocator.deallocate(m_data, m_size);
-            Initialize(std::forward<TT>(t_vector));
+            initialize(std::forward<TT>(t_vector));
         }
         return *this;
     }
@@ -115,7 +115,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     }
 
     template <typename Y>
-    constexpr void Initialize(Y&& t_vector) noexcept(!std::is_lvalue_reference_v<Y>) {
+    constexpr void initialize(Y&& t_vector) noexcept(!std::is_lvalue_reference_v<Y>) {
         if constexpr (std::is_lvalue_reference_v<Y>) {
             m_size = t_vector.m_size;
             m_capacity = t_vector.m_capacity;
@@ -212,7 +212,6 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     void reserve(std::size_t t_size) {
         // выделяю память без вызова конструктора(raw mem)
         auto new_arr = m_allocator.allocate(t_size);
-
         safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);
         m_data = std::exchange(new_arr, nullptr);
@@ -238,13 +237,19 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
 
     [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
+    void clear() noexcept {
+        // вызывает деструкторы у всех обьектов в диапозоне
+        std::destroy(begin(), end());
+        m_size = 0;
+    }
+
     MODIFIRE : pointer m_data;
     std::size_t m_size;
     std::size_t m_capacity;
     Allocator m_allocator;
 };
 
-// deduction hint для того чтобы вектор вывел тип от итератора
+// deduction hint для того чтобы вектор вывел тип от итератора через трейты
 template <typename InputIt>
 vector(InputIt t_first, InputIt t_last)
     -> vector<typename std::iterator_traits<InputIt>::value_type>;

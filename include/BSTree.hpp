@@ -5,11 +5,11 @@
 #include "traits.hpp"
 
 #include <iostream>
-#include <optional>
 #include <utility>
+#include <type_traits>
+#include <algorithm>
 
 // подумать насчет конструктора от Args...
-// обернуть все в optional
 
 namespace own {
 template <typename T> struct TreeNode : public INode {
@@ -18,7 +18,8 @@ template <typename T> struct TreeNode : public INode {
     template <typename TT, /* диспатчу forward reference чтобы чтобы производные классы корректно
     могли перемещаться через move конструктор (https://godbolt.org/z/Efvj1eb1G) */
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
-    constexpr explicit TreeNode(TT&& t_val) : m_val(std::forward<TT>(t_val)) {}
+    constexpr explicit TreeNode(TT&& t_val)
+        : m_val(std::forward<TT>(t_val)), m_left(nullptr), m_right(nullptr) {}
 
     template <typename TT>
     constexpr TreeNode(TT&& t_val, TreeNode* t_left, TreeNode* t_right)
@@ -45,7 +46,7 @@ template <typename T> struct TreeNode : public INode {
 };
 
 template <typename T> class BSTree : public base_traits<T> {
-  protected:
+  public:
     using base_traits<T>::value_type;
     using base_traits<T>::pointer;
     using base_traits<T>::reference;
@@ -55,27 +56,45 @@ template <typename T> class BSTree : public base_traits<T> {
     using node = TreeNode<T>;
 
   public:
-    constexpr BSTree() noexcept : m_root(nullptr) {}
+    constexpr BSTree() noexcept {}
 
-    template <typename U> constexpr BSTree(U&& t_val) { m_root = new_node(std::forward<U>(t_val)); }
+    constexpr BSTree(const std::initializer_list<T>& t_list) {
+        std::for_each(t_list.begin(), t_list.end(), [&](auto&& t_elem){
+            insert(std::forward<decltype(t_elem)>(t_elem)); });
+    }
 
-    //написать move ctor и copy ctor(операторы в том числе)
+    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree, std::remove_reference_t<U>>>>
+    explicit BSTree(U&& t_tree) {
+        initialize(std::forward<U>(t_tree));
+    }
 
     virtual ~BSTree() {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
-        post_order(m_root, [](auto&& t_node) { delete t_node; });
+        post_order(m_root, [](auto& t_node) { delete t_node; });
+    }
+
+  public:
+
+  protected:
+    template <typename Y>
+    constexpr void initialize(Y&& t_tree) noexcept(!std::is_lvalue_reference_v<Y>) {
+        if constexpr (std::is_lvalue_reference_v<Y>) {
+            m_root = copy_tree(t_tree.m_root);
+        } else {
+            m_root = std::exchange(t_tree.m_root, nullptr);
+        }
     }
 
   public:
     template <typename U> node* new_node(U&& t_elem) const {
-        return new node(std::forward<U>(t_elem), nullptr, nullptr);
+        return new node(std::forward<U>(t_elem));
     }
 
     template <typename... Args> node* construct_node(Args... t_args) const {
-        return new node(T(std::forward<Args>(t_args)...), nullptr, nullptr);
+        return new node(T(std::forward<Args>(t_args)...));
     }
 
-    const node* getMin() const noexcept {
+    const node* get_min() const noexcept {
         node* current = m_root;
         while (current && current->m_left != nullptr) {
             current = current->m_left;
@@ -84,7 +103,7 @@ template <typename T> class BSTree : public base_traits<T> {
         return current;
     }
 
-    const node* getMax() const noexcept {
+    const node* get_max() const noexcept {
         node* current = m_root;
         while (current && current->m_right != nullptr) {
             current = current->m_right;
@@ -96,6 +115,12 @@ template <typename T> class BSTree : public base_traits<T> {
     // iterative insert
     template <typename U> constexpr void insert(U&& t_elem) {
         node* new_nd = new_node(std::forward<U>(t_elem));
+
+        if (m_root == nullptr) {
+            m_root = new_nd;
+            return;
+        }
+
         node* start = m_root;
         node* to_start = nullptr;
 
@@ -117,7 +142,7 @@ template <typename T> class BSTree : public base_traits<T> {
         }
     }
 
-    // iterative delete.
+    // iterative delete
     void erase(const T& t_elem) {
         node* curr = m_root;
         node* prev = nullptr;
@@ -176,6 +201,18 @@ template <typename T> class BSTree : public base_traits<T> {
         }
     }
 
+    node* copy_tree(node* t_node) {
+        if (t_node == nullptr) {
+            return nullptr;
+        }
+
+        node* nd = new_node(t_node->m_val);
+        nd->m_left = copy_tree(t_node->m_left);
+        nd->m_right = copy_tree(t_node->m_right);
+
+        return nd;
+    }
+
     template <typename Func> constexpr void post_order(node* t_root, Func t_fn) {
         if (t_root != nullptr) {
             post_order(t_root->m_left, t_fn);
@@ -196,13 +233,13 @@ template <typename T> class BSTree : public base_traits<T> {
     void print() {
         // пока что так
         static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
-        inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val; });
+        inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
     }
 
     constexpr node* getRoot() const noexcept { return m_root; }
 
-  protected:
-    node* m_root;
+  MODIFIRE:
+    node* m_root = nullptr;
 };
 } // namespace own
 

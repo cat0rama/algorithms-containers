@@ -70,14 +70,14 @@ TEST(VECTOR_CONSTRUCTOR_TESTS, MOVE_CONSTRUCTOR_AND_OPERATOR) {
     ASSERT_EQ(test[4], 5);
 }
 
-TEST(VECTOR_CONSTRUCTOR_TESTS, INDEX_OPERATOR_TEST) {
+TEST(VECTOR_FUNCTION_TESTS, INDEX_OPERATOR_TEST) {
     vector<int> vec = {1,2,3,4,5,6};
 
     EXPECT_THROW(vec[75], std::out_of_range);
     ASSERT_EQ(vec[4], 5);
 }
 
-TEST(VECTOR_CONSTRUCTOR_TESTS, SAFE_CPY_TEST) {
+TEST(VECTOR_FUNCTION_TESTS, SAFE_CPY_TEST) {
     TestOther<vector<::Test>> test;
     vector<::Test> vec = {::Test(4), ::Test(5), ::Test(10)};
     vector<::Test> vec2;
@@ -85,6 +85,17 @@ TEST(VECTOR_CONSTRUCTOR_TESTS, SAFE_CPY_TEST) {
     // переделать функцию safe_cpy для работы через итераторы
 
     //test.safe_cpy(vec.begin(), vec2.begin(), vec.size());
+}
+
+TEST(VECTOR_FUNCTION_TESTS, CLEAR) {
+    vector<::Test> vec;
+    // потом написать тесткейс для этого случая отдельно
+    vector<vector<int>> vec2 = {{1,2,3}, {1,2,3}};
+    vec.push_back(::Test(4));
+    vec.push_back(::Test(6));
+    vec.clear();
+
+    ASSERT_EQ(vec.size(), 0);
 }
 
 int main(int argc, char **argv) {
