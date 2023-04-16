@@ -4,10 +4,10 @@
 #include "ITree.hpp"
 #include "traits.hpp"
 
-#include <iostream>
-#include <utility>
-#include <type_traits>
 #include <algorithm>
+#include <iostream>
+#include <type_traits>
+#include <utility>
 
 namespace own {
 template <typename T> struct TreeNode : public INode {
@@ -25,7 +25,10 @@ template <typename T> struct TreeNode : public INode {
 
     constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
 
-    TreeNode& operator=(TreeNode&& t_node) noexcept {
+    virtual ~TreeNode() {}
+
+  public:
+    virtual TreeNode& operator=(TreeNode<T>&& t_node) noexcept {
         if (this != &t_node) {
             static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
                           "object cannot be moved.\n");
@@ -43,64 +46,64 @@ template <typename T> struct TreeNode : public INode {
     TreeNode* m_right;
 };
 
-template <typename T> class BSTree : public base_traits<T> {
+template <typename T, class Allocator = std::allocator<T>> class BSTree {
   public:
-    using base_traits<T>::value_type;
-    using base_traits<T>::pointer;
-    using base_traits<T>::reference;
-    using base_traits<T>::const_pointer;
-    using base_traits<T>::const_reference;
-    using base_traits<T>::difference_type;
+    using value_type = T;
+    using allocator_type = Allocator;
+    using size_type = typename Allocator::size_type;
+    using difference_type = typename Allocator::difference_type;
+    using reference = typename Allocator::reference;
+    using const_reference = typename Allocator::const_reference;
+    using pointer = typename Allocator::pointer;
+    using const_pointer = typename Allocator::const_pointer;
     using node = TreeNode<T>;
 
   public:
     constexpr BSTree() noexcept {}
 
     constexpr BSTree(const std::initializer_list<T>& t_list) {
-        std::for_each(t_list.begin(), t_list.end(), [&](auto&& t_elem){
-            insert(std::forward<decltype(t_elem)>(t_elem)); });
+        std::for_each(t_list.begin(), t_list.end(), [&](auto& t_elem) { insert(t_elem); });
     }
 
-    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree, std::remove_reference_t<U>>>>
+    template <typename U,
+              typename = std::enable_if_t<std::is_base_of_v<BSTree, std::remove_reference_t<U>>>>
     explicit BSTree(U&& t_tree) {
-        initialize(std::forward<U>(t_tree));
+        *this = std::forward<U>(t_tree);
     }
 
-    virtual ~BSTree() {
-        // удаляем ноды через post_order обход и лямбду которая удаляет ноды
-        destroy();
-    }
+    virtual ~BSTree() { destroy(); }
 
   public:
-    template <typename U, typename = std::enable_if_t<std::is_base_of_v<BSTree, std::remove_reference_t<U>>>>
-    BSTree<T>& operator=(U&& t_tree) {
+    virtual BSTree<T>& operator=(const BSTree<T>& t_tree) {
         if (this != &t_tree) {
             destroy();
-            initialize(std::forward<U>(t_tree));
+            m_root = copy_tree(t_tree.m_root);
         }
 
         return *this;
     }
-protected:
+
+    virtual BSTree<T>& operator=(BSTree<T>&& t_tree) noexcept {
+        if (this != &t_tree) {
+            destroy();
+            m_root = std::exchange(t_tree.m_root, nullptr);
+        }
+
+        return *this;
+    }
+
+  protected:
     void destroy() noexcept {
+        // удаляем ноды через post_order обход и лямбду которая удаляет ноды
         post_order(m_root, [](auto& t_node) { delete t_node; });
     }
 
-    template <typename Y>
-    constexpr void initialize(Y&& t_tree) noexcept(!std::is_lvalue_reference_v<Y>) {
-        if constexpr (std::is_lvalue_reference_v<Y>) {
-            m_root = copy_tree(t_tree.m_root);
-        } else {
-            m_root = std::exchange(t_tree.m_root, nullptr);
-        }
-    }
-
   public:
-    template <typename U> node* new_node(U&& t_elem) const {
+    template <typename U> [[nodiscard]] node* new_node(U&& t_elem) const {
         return new node(std::forward<U>(t_elem));
     }
 
-    template <typename... Args> node* construct_node(Args... t_args) const {
+    template <typename... Args> [[nodiscard]] node* construct_node(Args... t_args) const {
         return new node(T(std::forward<Args>(t_args)...));
     }
 
@@ -123,8 +126,8 @@ protected:
     }
 
     // iterative insert
-    template <typename U> void insert(U&& t_elem) {
-        node* new_nd = new_node(std::forward<U>(t_elem));
+    virtual void insert(const T& t_elem) {
+        node* new_nd = new_node(t_elem);
 
         if (m_root == nullptr) {
             m_root = new_nd;
@@ -153,7 +156,7 @@ protected:
     }
 
     // iterative delete
-    void erase(const T& t_elem) {
+    void erase(const T& t_elem) noexcept {
         node* curr = m_root;
         node* prev = nullptr;
 
@@ -166,7 +169,6 @@ protected:
             }
         }
 
-        // if not found
         if (curr == nullptr) {
             return;
         }
@@ -246,10 +248,9 @@ protected:
         inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
     }
 
-    [[nodiscard]] constexpr node* getRoot() const noexcept { return m_root; }
+    [[nodiscard]] constexpr node* get_root() const noexcept { return m_root; }
 
-  MODIFIRE:
-    node* m_root = nullptr;
+    MODIFIRE : node* m_root = nullptr;
 };
 } // namespace own
 

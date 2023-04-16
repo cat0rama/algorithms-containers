@@ -2,8 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <set>
-#include <list>
 
 #include "vector.hpp"
 #include "set.hpp"
@@ -29,11 +27,19 @@ int main() {
 //
 //    tree2.print();
 
-    BSTree<int>* ptr = new AVLTree<int>;
+    AVLTree<int> ptd;
+
+    BSTree<int>* ptr = new AVLTree<int>(std::move(ptd));
 
     ptr->insert(3);
     ptr->insert(3);
     ptr->print();
 
     delete ptr;
+    
+    TreeNode<int>* tr = new AVLNode<int>;
+
+    *tr = AVLNode<int>(3);
+
+    delete tr;
 }
