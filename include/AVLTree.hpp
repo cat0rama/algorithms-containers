@@ -5,7 +5,7 @@
 
 namespace own {
 template <typename T> struct AVLNode : public TreeNode<T> {
-    constexpr AVLNode() noexcept : TreeNode<T>() {}
+    constexpr AVLNode() noexcept : m_key(0), TreeNode<T>() {}
 
     template <typename TT,
               typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
@@ -16,23 +16,24 @@ template <typename T> struct AVLNode : public TreeNode<T> {
         : TreeNode<T>(std::forward<TT>(t_val), t_left, t_right) {}
 
     constexpr AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
-        *this = std::move(t_node);
+        m_height = std::exchange(t_node.m_height, 0);
+        m_key = std::exchange(t_node.m_key, 0);
     }
 
   public:
-    AVLNode& operator=(TreeNode<T>&& t_node) noexcept override {
+    AVLNode& operator=(AVLNode<T>&& t_node) noexcept {
         if (this != &t_node) {
+            m_height = std::exchange(t_node.m_height, 0);
+            m_key = std::exchange(t_node.m_key, 0);
             TreeNode<T>::operator=(std::move(t_node));
-            // m_height = std::exchange(t_node.m_height, 0);
-            // m_key = std::exchange(t_node.m_key, 0);
         }
 
         return *this;
     }
 
   public:
-    std::size_t m_height = defines::DEFAULT_HEIGHT;
     std::uint8_t m_key;
+    std::size_t m_height = defines::DEFAULT_HEIGHT;
 };
 
 template <typename T> class AVLTree : public BSTree<T> {

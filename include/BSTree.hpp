@@ -27,8 +27,9 @@ template <typename T> struct TreeNode : public INode {
 
     virtual ~TreeNode() {}
 
-  public:
-    virtual TreeNode& operator=(TreeNode<T>&& t_node) noexcept {
+    // protected чтобы нельзя было создавать производный обьект через ссылку на базовый класс
+  protected:
+    TreeNode& operator=(TreeNode<T>&& t_node) noexcept {
         if (this != &t_node) {
             static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
                           "object cannot be moved.\n");
@@ -96,6 +97,18 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
     void destroy() noexcept {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
         post_order(m_root, [](auto& t_node) { delete t_node; });
+    }
+
+    node* copy_tree(node* t_node) {
+        if (t_node == nullptr) {
+            return nullptr;
+        }
+
+        node* nd = new_node(t_node->m_val);
+        nd->m_left = copy_tree(t_node->m_left);
+        nd->m_right = copy_tree(t_node->m_right);
+
+        return nd;
     }
 
   public:
@@ -211,18 +224,6 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
             curr->m_val = tmp->m_val;
             delete tmp;
         }
-    }
-
-    node* copy_tree(node* t_node) {
-        if (t_node == nullptr) {
-            return nullptr;
-        }
-
-        node* nd = new_node(t_node->m_val);
-        nd->m_left = copy_tree(t_node->m_left);
-        nd->m_right = copy_tree(t_node->m_right);
-
-        return nd;
     }
 
     template <typename Func> constexpr void post_order(node* t_root, Func t_fn) {
