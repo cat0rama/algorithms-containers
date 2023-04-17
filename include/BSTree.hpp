@@ -74,8 +74,9 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
 
     virtual ~BSTree() { destroy(); }
 
-  public:
-    virtual BSTree<T>& operator=(const BSTree<T>& t_tree) {
+    // protected чтобы нельзя было создавать производный обьект через ссылку на базовый класс
+  protected:
+    BSTree<T>& operator=(const BSTree<T>& t_tree) {
         if (this != &t_tree) {
             destroy();
             m_root = copy_tree(t_tree.m_root);
@@ -84,7 +85,7 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
         return *this;
     }
 
-    virtual BSTree<T>& operator=(BSTree<T>&& t_tree) noexcept {
+    BSTree<T>& operator=(BSTree<T>&& t_tree) noexcept {
         if (this != &t_tree) {
             destroy();
             m_root = std::exchange(t_tree.m_root, nullptr);
@@ -242,14 +243,14 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
         }
     }
 
-    // проверить на наличие перегруженного оператора <<
     void print() {
-        // пока что так
         static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
         inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
     }
 
-    [[nodiscard]] constexpr node* get_root() const noexcept { return m_root; }
+    [[nodiscard]] virtual const node* const get_root() const noexcept { return m_root; }
+
+    [[nodiscard]] virtual node* get_root() noexcept { return m_root; }
 
     MODIFIRE : node* m_root = nullptr;
 };

@@ -38,6 +38,8 @@ template <typename T> struct AVLNode : public TreeNode<T> {
 
 template <typename T> class AVLTree : public BSTree<T> {
   public:
+    using node = AVLNode<T>;
+  public:
     constexpr AVLTree() noexcept : BSTree<T>() {}
 
     constexpr AVLTree(const std::initializer_list<T>& t_list) : BSTree<T>(t_list) {}
@@ -49,29 +51,28 @@ template <typename T> class AVLTree : public BSTree<T> {
     virtual ~AVLTree() {}
 
   public:
-    AVLTree<T>& operator=(const BSTree<T>& t_tree) override {
+    AVLTree<T>& operator=(const AVLTree<T>& t_tree) {
         if (this != &t_tree) {
             BSTree<T>::operator=(t_tree);
-            // m_height = t_tree.m_height;
-            // m_key = t_tree.m_key;
         }
 
         return *this;
     }
 
-    AVLTree<T>& operator=(BSTree<T>&& t_tree) noexcept override {
+    AVLTree<T>& operator=(AVLTree<T>&& t_tree) noexcept {
         if (this != &t_tree) {
             BSTree<T>::operator=(std::move(t_tree));
-            // m_height = std::exchange(t_tree.m_height, 0);
-            // m_key = std::exchange(t_tree.m_key, 0);
         }
 
         return *this;
     }
 
   public:
+    [[nodiscard]] virtual const node* const get_root() const noexcept override { return m_root; }
 
+    [[nodiscard]] virtual node* get_root() noexcept override { return m_root; }
   protected:
+    node* m_root = nullptr;
 };
 
 } // namespace own

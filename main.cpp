@@ -27,19 +27,19 @@ int main() {
 //
 //    tree2.print();
 
-    AVLTree<int> ptd;
 
-    BSTree<int>* ptr = new AVLTree<int>(std::move(ptd));
+	/*AVLNode<int> a;
+	AVLNode<int> b = std::move(a);
 
-    ptr->insert(3);
-    ptr->insert(3);
-    ptr->print();
+	TreeNode<int> k;
+    TreeNode<int> l = std::move(k);*/
 
-    delete ptr;
-    
-    TreeNode<int>* tr = new AVLNode<int>;
+	//BSTree<int>* tree = new AVLTree<int>;
+	//
+	//*tree = AVLTree<int>();
 
-    *tr = AVLNode<int>(3);
+	const AVLTree<int> tree;
+	AVLTree<int> tree2;
 
-    delete tr;
+
 }
