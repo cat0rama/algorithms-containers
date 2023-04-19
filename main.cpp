@@ -38,8 +38,8 @@ int main() {
 	//
 	//*tree = AVLTree<int>();
 
-	const AVLTree<int> tree;
-	AVLTree<int> tree2;
+	//AVLTree<int> tree2;
+	//tree2.insert(3);
 
-
+	//tree2.print();
 }

@@ -13,6 +13,7 @@ struct INode {
     virtual ~INode() = default;
     INode& operator=(const INode&) = delete;
 };
+
 } // namespace own
 
 #endif

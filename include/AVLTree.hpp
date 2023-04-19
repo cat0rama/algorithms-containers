@@ -53,7 +53,8 @@ template <typename T> class AVLTree : public BSTree<T> {
   public:
     AVLTree<T>& operator=(const AVLTree<T>& t_tree) {
         if (this != &t_tree) {
-            BSTree<T>::operator=(t_tree);
+            BSTree<int>::destroy();
+            BSTree<int>::operator=(t_tree);
         }
 
         return *this;
@@ -61,18 +62,20 @@ template <typename T> class AVLTree : public BSTree<T> {
 
     AVLTree<T>& operator=(AVLTree<T>&& t_tree) noexcept {
         if (this != &t_tree) {
-            BSTree<T>::operator=(std::move(t_tree));
+            BSTree<int>::destroy();
+            BSTree<int>::operator=(std::move(t_tree));
         }
 
         return *this;
     }
 
   public:
-    [[nodiscard]] virtual const node* const get_root() const noexcept override { return m_root; }
+    [[nodiscard]] virtual const node* get_root() const noexcept override { return m_root; }
 
     [[nodiscard]] virtual node* get_root() noexcept override { return m_root; }
+
   protected:
-    node* m_root = nullptr;
+    node* m_root = &NodeWrapper<T>::m_node;
 };
 
 } // namespace own

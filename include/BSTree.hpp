@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <type_traits>
 #include <utility>
 
 namespace own {
@@ -47,7 +46,8 @@ template <typename T> struct TreeNode : public INode {
     TreeNode* m_right;
 };
 
-template <typename T, class Allocator = std::allocator<T>> class BSTree {
+template <typename T, typename Allocator = std::allocator<T>>
+class BSTree : protected NodeWrapper<T> {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -140,7 +140,7 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
     }
 
     // iterative insert
-    virtual void insert(const T& t_elem) {
+    void insert(const T& t_elem) {
         node* new_nd = new_node(t_elem);
 
         if (m_root == nullptr) {
@@ -248,11 +248,11 @@ template <typename T, class Allocator = std::allocator<T>> class BSTree {
         inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
     }
 
-    [[nodiscard]] virtual const node* const get_root() const noexcept { return m_root; }
+    [[nodiscard]] virtual const node* get_root() const noexcept { return m_root; }
 
     [[nodiscard]] virtual node* get_root() noexcept { return m_root; }
-
-    MODIFIRE : node* m_root = nullptr;
+protected: 
+    node* m_root = &NodeWrapper<T>::m_node;
 };
 } // namespace own
 
