@@ -6,7 +6,6 @@
 #include "vector.hpp"
 #include "set.hpp"
 #include "BSTree.hpp"
-#include "AVLTree.hpp"
 #include "tests/tests.hpp"
 
 using namespace own;
@@ -38,8 +37,17 @@ int main() {
 	//
 	//*tree = AVLTree<int>();
 
-	//AVLTree<int> tree2;
-	//tree2.insert(3);
+	/*avltree<int> tree;
+	avltree<int> tree2;
+	tree2.insert(3);
+    tree2.insert(3);
+    tree2.insert(3);
+    tree2.insert(9);
 
-	//tree2.print();
+	tree = tree2;
+
+	tree.print();*/
+
+	AVLTree<int> fl;
+
 }

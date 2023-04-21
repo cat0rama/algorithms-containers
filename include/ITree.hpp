@@ -2,9 +2,9 @@
 #define ITREE_HPP_H
 
 #include "defines.hpp"
-#include "traits.hpp"
+#include "AVLNode.hpp"
 
-// Абстрактный класс ноды для построения иерархии
+// абстрактный класс ноды для построения иерархии
 
 namespace own {
 struct INode {
@@ -14,6 +14,11 @@ struct INode {
     INode& operator=(const INode&) = delete;
 };
 
+// подумать как можно сделать лучше, слишком много проблем возникает при данном подходе
+template <typename L, typename U = AVLNode<L>> struct NodeWrapper {
+    U* m_node = nullptr;
+    using value = U;
+};
 } // namespace own
 
 #endif

@@ -1,51 +1,14 @@
 #ifndef BSTREE_HPP_H
 #define BSTREE_HPP_H
 
-#include "ITree.hpp"
-#include "traits.hpp"
-
 #include <algorithm>
 #include <iostream>
 #include <utility>
 
+#include "ITree.hpp"
+#include "TreeNode.hpp"
+
 namespace own {
-template <typename T> struct TreeNode : public INode {
-    constexpr TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
-
-    template <typename TT, /* диспатчу forward reference чтобы чтобы производные классы корректно
-    могли перемещаться через move конструктор (https://godbolt.org/z/Efvj1eb1G) */
-              typename = std::enable_if_t<!std::is_base_of_v<INode, std::remove_reference_t<TT>>>>
-    constexpr explicit TreeNode(TT&& t_val)
-        : m_val(std::forward<TT>(t_val)), m_left(nullptr), m_right(nullptr) {}
-
-    template <typename TT>
-    constexpr TreeNode(TT&& t_val, TreeNode* t_left, TreeNode* t_right)
-        : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right) {}
-
-    constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
-
-    virtual ~TreeNode() {}
-
-    // protected чтобы нельзя было создавать производный обьект через ссылку на базовый класс
-  protected:
-    TreeNode& operator=(TreeNode<T>&& t_node) noexcept {
-        if (this != &t_node) {
-            static_assert(std::is_move_assignable_v<T> || std::is_move_constructible_v<T>,
-                          "object cannot be moved.\n");
-            m_val = std::exchange(t_node.m_val, T());
-            m_left = std::exchange(t_node.m_left, nullptr);
-            m_right = std::exchange(t_node.m_right, nullptr);
-        }
-
-        return *this;
-    }
-
-  public:
-    T m_val;
-    TreeNode* m_left;
-    TreeNode* m_right;
-};
-
 template <typename T, typename Allocator = std::allocator<T>>
 class BSTree : protected NodeWrapper<T> {
   public:
@@ -57,6 +20,7 @@ class BSTree : protected NodeWrapper<T> {
     using const_reference = typename Allocator::const_reference;
     using pointer = typename Allocator::pointer;
     using const_pointer = typename Allocator::const_pointer;
+    using wrapper_type = typename NodeWrapper<T>::value;
     using node = TreeNode<T>;
 
   public:
@@ -97,7 +61,7 @@ class BSTree : protected NodeWrapper<T> {
   protected:
     void destroy() noexcept {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
-        post_order(m_root, [](auto& t_node) { delete t_node; });
+        post_order(m_root, [](auto t_node) { delete t_node; });
     }
 
     node* copy_tree(node* t_node) {
@@ -114,11 +78,11 @@ class BSTree : protected NodeWrapper<T> {
 
   public:
     template <typename U> [[nodiscard]] node* new_node(U&& t_elem) const {
-        return new node(std::forward<U>(t_elem));
+        return new wrapper_type(std::forward<U>(t_elem));
     }
 
     template <typename... Args> [[nodiscard]] node* construct_node(Args... t_args) const {
-        return new node(T(std::forward<Args>(t_args)...));
+        return new wrapper_type(T(std::forward<Args>(t_args)...));
     }
 
     [[nodiscard]] const node* get_min() const noexcept {
@@ -140,7 +104,7 @@ class BSTree : protected NodeWrapper<T> {
     }
 
     // iterative insert
-    void insert(const T& t_elem) {
+    virtual void insert(const T& t_elem) {
         node* new_nd = new_node(t_elem);
 
         if (m_root == nullptr) {
@@ -251,8 +215,10 @@ class BSTree : protected NodeWrapper<T> {
     [[nodiscard]] virtual const node* get_root() const noexcept { return m_root; }
 
     [[nodiscard]] virtual node* get_root() noexcept { return m_root; }
-protected: 
-    node* m_root = &NodeWrapper<T>::m_node;
+
+  protected:
+      // down cast до типа ноды данной стрктуры данных
+    node* m_root = static_cast<node*>(NodeWrapper<T>::m_node);
 };
 } // namespace own
 

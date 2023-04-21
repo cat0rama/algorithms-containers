@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <type_traits>
 
-#include "AVLTree.hpp"
-
 // потом сделать через флаг в cmake
 #define SWITCH_MODIFIRE
 #define THROW_FURTHER throw
@@ -28,15 +26,5 @@ constexpr std::size_t FACTOR = 2;
 constexpr bool NON_CONST = false;
 constexpr bool CONST = true;
 } // namespace own::defines
-
-namespace own {
-/* Обертка над нодой, чтобы реализовать иерархичный
-доступ к членам ноды в зависимости от дерева
-*/
-
-template <typename T> struct NodeWrapper {
-    AVLNode<T> m_node;
-};
-}
 
 #endif

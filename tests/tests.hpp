@@ -62,7 +62,7 @@ public:
         std::cout << "construct" << std::endl;
     }
 
-    ExceptionTest(std::string, int) {
+    ExceptionTest(std::string, int)  {
         std::cout << "string:int" << std::endl;
     }
 
@@ -70,7 +70,7 @@ public:
         a = _a;
     }
 
-    ExceptionTest(ExceptionTest&& c) {
+    ExceptionTest(ExceptionTest&& c) noexcept {
         a = c.a;
         std::cout << "move";
         //throw std::exception("this is sparta!");
@@ -88,7 +88,7 @@ public:
         return *this;
     }
 
-    ExceptionTest& operator=(ExceptionTest&&) {
+    ExceptionTest& operator=(ExceptionTest&&) noexcept {
         //throw std::exception("this is sparta!");
         return *this;
     };
