@@ -10,7 +10,7 @@
 
 namespace own {
 template <typename T, typename Allocator = std::allocator<T>>
-class BSTree : protected NodeWrapper<T> {
+class BSTree : protected NodeWrapper<T, TreeNode<T>> {
   public:
     using value_type = T;
     using allocator_type = Allocator;
@@ -38,8 +38,7 @@ class BSTree : protected NodeWrapper<T> {
 
     virtual ~BSTree() { destroy(); }
 
-    // protected чтобы нельзя было создавать производный обьект через ссылку на базовый класс
-  protected:
+  public:
     BSTree<T>& operator=(const BSTree<T>& t_tree) {
         if (this != &t_tree) {
             destroy();
@@ -61,6 +60,10 @@ class BSTree : protected NodeWrapper<T> {
   protected:
     void destroy() noexcept {
         // удаляем ноды через post_order обход и лямбду которая удаляет ноды
+        if (m_root == nullptr) {
+            return;
+        }
+
         post_order(m_root, [](auto t_node) { delete t_node; });
     }
 
@@ -69,11 +72,11 @@ class BSTree : protected NodeWrapper<T> {
             return nullptr;
         }
 
-        node* nd = new_node(t_node->m_val);
-        nd->m_left = copy_tree(t_node->m_left);
-        nd->m_right = copy_tree(t_node->m_right);
+        node* node = new_node(t_node->m_val);
+        node->m_left = copy_tree(t_node->m_left);
+        node->m_right = copy_tree(t_node->m_right);
 
-        return nd;
+        return node;
     }
 
   public:
@@ -103,8 +106,8 @@ class BSTree : protected NodeWrapper<T> {
         return current;
     }
 
-    // iterative insert
-    virtual void insert(const T& t_elem) {
+    // iterative insert, для того чтобы не принимать указатель на ноду
+    void insert(const T& t_elem) {
         node* new_nd = new_node(t_elem);
 
         if (m_root == nullptr) {
@@ -133,7 +136,7 @@ class BSTree : protected NodeWrapper<T> {
         }
     }
 
-    // iterative delete
+    // iterative deletе, для того чтобы не принимать указатель на ноду
     void erase(const T& t_elem) noexcept {
         node* curr = m_root;
         node* prev = nullptr;
@@ -147,9 +150,7 @@ class BSTree : protected NodeWrapper<T> {
             }
         }
 
-        if (curr == nullptr) {
-            return;
-        }
+        if (curr == nullptr) { return; }
 
         if (curr->m_left == nullptr || curr->m_right == nullptr) {
             node* new_curr = nullptr;
@@ -159,9 +160,7 @@ class BSTree : protected NodeWrapper<T> {
                 new_curr = curr->m_left;
             }
 
-            if (prev == nullptr) {
-                return;
-            }
+            if (prev == nullptr) { return; }
 
             if (curr == prev->m_left) {
                 prev->m_left = new_curr;
@@ -209,15 +208,15 @@ class BSTree : protected NodeWrapper<T> {
 
     void print() {
         static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
-        inorder(m_root, [](auto&& t_node) { std::cout << t_node->m_val << ' '; });
+        inorder(m_root, [](auto t_node) { std::cout << t_node->m_val << ' '; });
     }
 
-    [[nodiscard]] virtual const node* get_root() const noexcept { return m_root; }
+    [[nodiscard]] const node* get_root() const noexcept { return m_root; }
 
-    [[nodiscard]] virtual node* get_root() noexcept { return m_root; }
+    [[nodiscard]] node* get_root() noexcept { return m_root; }
 
   protected:
-      // down cast до типа ноды данной стрктуры данных
+      // down cast до типа ноды данной структуры данных
     node* m_root = static_cast<node*>(NodeWrapper<T>::m_node);
 };
 } // namespace own

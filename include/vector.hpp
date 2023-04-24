@@ -80,6 +80,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
             m_allocator.deallocate(m_data, m_size);
             initialize(std::forward<TT>(t_vector));
         }
+
         return *this;
     }
 
@@ -98,6 +99,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
 
         return m_data[t_i];
     }
+
     MODIFIRE : template <typename Iter> void safe_cpy(Iter t_from, Iter t_to, std::size_t t_size) {
         if (!t_from || !t_to) {
             throw std::invalid_argument("invalid iterator provided.\n");
@@ -134,6 +136,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         if (t_i >= m_size) {
             throw std::out_of_range("index out of range.\n");
         }
+
         return m_data[t_i];
     }
 
@@ -141,6 +144,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         if (t_i >= m_size) {
             throw std::out_of_range("index out of range.\n");
         }
+
         return m_data[t_i];
     }
 
@@ -179,7 +183,8 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
          */
     }
 
-    template <typename... Args> reference emplace_back(Args&&... t_args) {
+    template <typename... Args> constexpr 
+    reference emplace_back(Args&&... t_args) {
         if (m_capacity == m_size) {
             reserve(m_size * FACTOR);
         }
@@ -194,22 +199,21 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         new (m_data + m_size++) T(std::forward<PP>(t_elem));
     }
 
-    void pop_back() {
+    constexpr void pop_back() {
         if (m_size == 0) {
             throw std::underflow_error("vector is empty.\n");
         }
         (m_data + --m_size)->~T();
     }
 
-    void resize(std::size_t t_size) {
+    constexpr void resize(std::size_t t_size) {
         if (t_size > m_capacity) {
             reserve(t_size);
         }
         m_size = t_size;
     }
 
-    void reserve(std::size_t t_size) {
-        // выделяю память без вызова конструктора(raw mem)
+    constexpr void reserve(std::size_t t_size) {
         auto new_arr = m_allocator.allocate(t_size);
         safe_cpy(m_data, new_arr, m_size);
         m_allocator.deallocate(m_data, m_capacity);
@@ -217,8 +221,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         m_capacity = t_size;
     }
 
-    void shrink_to_fit() {
-        // пока что так
+    constexpr void shrink_to_fit() {
         reserve(m_size);
     }
 

@@ -48,6 +48,5 @@ int main() {
 
 	tree.print();*/
 
-	AVLTree<int> fl;
-
+	vector<int> lower = {1, 2, 3, 4};
 }

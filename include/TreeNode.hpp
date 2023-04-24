@@ -3,6 +3,8 @@
 
 #include "ITree.hpp"
 
+// подумать насчет операторов сравнения
+
 namespace own {
 template <typename T> struct TreeNode : public INode {
     constexpr TreeNode() noexcept : m_val(T()), m_left(nullptr), m_right(nullptr) {}
