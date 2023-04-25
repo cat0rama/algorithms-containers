@@ -27,6 +27,7 @@ class Test {
 
     Test(const Test& e) {
         a = e.a;
+        std::cout << "copy";
     };
 
     Test& operator=(const Test& elem) {

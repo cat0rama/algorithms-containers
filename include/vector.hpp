@@ -222,7 +222,47 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     }
 
     constexpr void shrink_to_fit() {
+        if (m_size == 0) {
+            throw std::runtime_error("size is equal to zero.\n");
+        }
+
         reserve(m_size);
+    }
+
+    template <typename II> iterator insert(iterator t_pos, II&& t_elem) {
+        auto pos = std::distance(begin(), t_pos);
+        if (pos > m_size) {
+            throw std::out_of_range("iterator position are out of range.\n");
+        }
+
+        const auto new_size = m_size + 1;
+        if (new_size > m_capacity) {
+            reserve(new_size * FACTOR);
+        }
+
+        for (auto i = m_size; i > pos; --i) {
+            m_data[i] = std::move(m_data[i - 1]);
+        }
+        new (m_data + pos) T(std::forward<II>(t_elem));
+        m_size++;
+    }
+
+    void erase(iterator t_pos) noexcept {
+        auto pos = std::distance(begin(), t_pos);
+        if (pos > m_size) {
+            throw std::out_of_range("iterator position are out of range.\n");
+        }
+
+        for (auto i = pos; i < m_size - 1; i++) {
+            m_data[i] = std::move(m_data[i + 1]);
+        }
+        m_size--;
+    }
+
+    constexpr void clear() noexcept {
+        // вызывает деструкторы у всех обьектов в диапозоне
+        std::destroy(begin(), end());
+        m_size = 0;
     }
 
     [[nodiscard]] constexpr reference back() { return m_data[m_size - 1]; }
@@ -238,12 +278,6 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     [[nodiscard]] constexpr std::size_t capacity() const noexcept { return m_capacity; }
 
     [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
-
-    void clear() noexcept {
-        // вызывает деструкторы у всех обьектов в диапозоне
-        std::destroy(begin(), end());
-        m_size = 0;
-    }
 
     MODIFIRE : pointer m_data;
     std::size_t m_size;

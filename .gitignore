@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
 .vscode
-*build
+*build*
 *.vs
 *.idea
 cmake*
