@@ -110,7 +110,6 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         } catch (...) {
             // удаляю память через deallocate, который вызовет деструкторы у обьектов
             m_allocator.deallocate(t_to, t_size);
-
             THROW_FURTHER;
         }
     }
@@ -173,6 +172,20 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     constexpr const_reverse_iterator crend() const noexcept {
         return const_reverse_iterator(m_data);
     }
+
+    [[nodiscard]] constexpr reference back() { return m_data[m_size - 1]; }
+
+    [[nodiscard]] constexpr reference front() { return m_data[0]; }
+
+    [[nodiscard]] constexpr const_reference back() const { return m_data[m_size - 1]; }
+
+    [[nodiscard]] constexpr const_reference front() const { return m_data[0]; }
+
+    [[nodiscard]] constexpr std::size_t size() const noexcept { return m_size; }
+
+    [[nodiscard]] constexpr std::size_t capacity() const noexcept { return m_capacity; }
+
+    [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
     [[nodiscard]] constexpr size_t max_size() const noexcept {
         // тк аллокатор выделяет память, надо брать значения у него
@@ -242,9 +255,10 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
 
         for (auto i = m_size; i > pos; --i) {
             m_data[i] = std::move(m_data[i - 1]);
-        }
+        };
         new (m_data + pos) T(std::forward<II>(t_elem));
         m_size++;
+        return iterator(m_data + pos);
     }
 
     void erase(iterator t_pos) noexcept {
@@ -259,25 +273,26 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         m_size--;
     }
 
+    template <typename... Args>
+    iterator emplace(const_iterator t_pos, Args&&... t_args) {
+        auto pos = std::distance(cbegin(), t_pos);
+        if (pos > m_size) {
+            throw std::out_of_range("iterator position are out of range.\n");
+        }
+        
+        for (auto i = m_size; i > pos; --i) {
+            m_data[i] = std::move(m_data[i - 1]);
+        };
+        new (m_data + pos) T(std::forward<Args>(t_args)...);
+        m_size++;
+        return iterator(m_data + pos);
+    }
+
     constexpr void clear() noexcept {
         // вызывает деструкторы у всех обьектов в диапозоне
         std::destroy(begin(), end());
         m_size = 0;
     }
-
-    [[nodiscard]] constexpr reference back() { return m_data[m_size - 1]; }
-
-    [[nodiscard]] constexpr reference front() { return m_data[0]; }
-
-    [[nodiscard]] constexpr const_reference back() const { return m_data[m_size - 1]; }
-
-    [[nodiscard]] constexpr const_reference front() const { return m_data[0]; }
-
-    [[nodiscard]] constexpr std::size_t size() const noexcept { return m_size; }
-
-    [[nodiscard]] constexpr std::size_t capacity() const noexcept { return m_capacity; }
-
-    [[nodiscard]] constexpr bool empty() const noexcept { return begin() == end(); }
 
     MODIFIRE : pointer m_data;
     std::size_t m_size;

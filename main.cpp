@@ -48,18 +48,24 @@ int main() {
 
 	tree.print();*/
 
-	vector<Test> vec = {Test(1), Test(2), Test(3)};
+	//vector<Test> vec = {Test(1), Test(2), Test(3)};
 
-	vec.erase(vec.begin());
+	//vec.erase(vec.begin());
 
-	std::for_each(vec.begin(), vec.end(), [](auto elem) { std::cout << elem.a << ' ';
-	});
+	//std::for_each(vec.begin(), vec.end(), [](auto elem) { std::cout << elem.a << ' ';
+	//});
 
-	std::cout << std::endl;
+	//std::cout << std::endl;
 
-	std::vector<Test> vec2 = {Test(1), Test(2), Test(3)};
+	//std::vector<Test> vec2 = {Test(1), Test(2), Test(3)};
 
-    vec2.erase(vec2.begin());
+ //   vec2.erase(vec2.begin());
 
-    std::for_each(vec2.begin(), vec2.end(), [](auto elem) { std::cout << elem.a << ' '; });
+ //   std::for_each(vec2.begin(), vec2.end(), [](auto elem) { std::cout << elem.a << ' '; });
+
+	vector<int> f;
+
+	std::cout << *f.insert(f.begin(), 3);
+
+	std::cout << *f.emplace(f.cbegin(), 4);
 }
