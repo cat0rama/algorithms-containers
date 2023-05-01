@@ -36,7 +36,10 @@ class Test {
         return *this;
     }
 
-    Test& operator=(Test&&) {return *this;};
+    Test& operator=(Test&& elem) {
+        a = elem.a;
+        return *this;
+    };
 
     friend bool operator>(const Test& a, const Test& b) {
         return a.a > b.a;

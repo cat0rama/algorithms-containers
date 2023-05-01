@@ -53,7 +53,7 @@ TEST(VECTOR_CONSTRUCTOR_TESTS, ITERATOR_CONSTRUCTOR) {
 
 TEST(VECTOR_CONSTRUCTOR_TESTS, COPY_CONSTRUCTOR_AND_OPERATOR) {
     ::Test l(43);
-    vector<::Test> test = {::Test(1), l};
+    vector<::Test> test {::Test(1), l};
     decltype(test) test2;
 
     test2 = test;
@@ -77,20 +77,22 @@ TEST(VECTOR_FUNCTION_TESTS, INDEX_OPERATOR_TEST) {
     ASSERT_EQ(vec[4], 5);
 }
 
-TEST(VECTOR_FUNCTION_TESTS, SAFE_CPY_TEST) {
-    TestOther<vector<::Test>> test;
-    vector<::Test> vec = {::Test(4), ::Test(5), ::Test(10)};
-    vector<::Test> vec2;
+TEST(VECTOR_FUNCTION_TESTS, METHOD_AT_TEST) {
+    vector<int> vec = {1, 2, 3, 4, 5, 6};
 
-    // переделать функцию safe_cpy для работы через итераторы
-
-    //test.safe_cpy(vec.begin(), vec2.begin(), vec.size());
+    EXPECT_THROW(vec.at(75), std::out_of_range);
+    ASSERT_EQ(vec.at(3), 4);
 }
 
-TEST(VECTOR_FUNCTION_TESTS, CLEAR) {
+TEST(VECTOR_FUNCTION_TESTS, METHOD_FILL_TEST) { 
+    vector<int> vec(10); 
+    vec.fill(3);
+
+    std::for_each(vec.begin(), vec.end(), [](auto elem) { ASSERT_EQ(elem , 3); });
+}
+
+TEST(VECTOR_FUNCTION_TESTS, METHOD_CLEAR_TEST) {
     vector<::Test> vec;
-    // потом написать тесткейс для этого случая отдельно
-    vector<vector<int>> vec2 = {{1,2,3}, {1,2,3}};
     vec.push_back(::Test(4));
     vec.push_back(::Test(6));
     vec.clear();

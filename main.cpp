@@ -60,12 +60,11 @@ int main() {
 	//std::vector<Test> vec2 = {Test(1), Test(2), Test(3)};
 
  //   vec2.erase(vec2.begin());
+	vector<Test> vec(10);
 
- //   std::for_each(vec2.begin(), vec2.end(), [](auto elem) { std::cout << elem.a << ' '; });
+	auto l = vec.emplace(vec.begin(), Test(1), Test(2), Test(3), Test(4));
 
-	vector<int> f;
-
-	std::cout << *f.insert(f.begin(), 3);
-
-	std::cout << *f.emplace(f.cbegin(), 4);
+	std::for_each(vec.begin(), vec.end(), [](auto elem) { 
+		std::cout << elem.a << ' ';
+	});
 }

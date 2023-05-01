@@ -253,7 +253,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
             reserve(new_size * FACTOR);
         }
 
-        for (auto i = m_size; i > pos; --i) {
+        for (auto i = m_size; i > pos; i--) {
             m_data[i] = std::move(m_data[i - 1]);
         };
         new (m_data + pos) T(std::forward<II>(t_elem));
@@ -261,7 +261,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         return iterator(m_data + pos);
     }
 
-    void erase(iterator t_pos) noexcept {
+    void erase(iterator t_pos) {
         auto pos = std::distance(begin(), t_pos);
         if (pos > m_size) {
             throw std::out_of_range("iterator position are out of range.\n");
@@ -273,8 +273,8 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         m_size--;
     }
 
-    template <typename... Args>
-    iterator emplace(const_iterator t_pos, Args&&... t_args) {
+    template <typename Y>
+    iterator emplace(const_iterator t_pos, Y&& t_arg) {
         auto pos = std::distance(cbegin(), t_pos);
         if (pos > m_size) {
             throw std::out_of_range("iterator position are out of range.\n");
@@ -283,11 +283,18 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         for (auto i = m_size; i > pos; --i) {
             m_data[i] = std::move(m_data[i - 1]);
         };
-        new (m_data + pos) T(std::forward<Args>(t_args)...);
+        new (m_data + pos) T(std::forward<Y>(t_arg));
         m_size++;
         return iterator(m_data + pos);
     }
 
+    template <typename T, typename... Args>
+    iterator emplace(const_iterator t_pos, T&& t_elem, Args&&... t_args) {
+        emplace(t_pos, std::forward<Args>(t_args)...);
+        emplace(t_pos, std::forward<T>(t_elem));
+        return iterator(m_data + sizeof...(t_args));
+    }
+   
     constexpr void clear() noexcept {
         // вызывает деструкторы у всех обьектов в диапозоне
         std::destroy(begin(), end());
