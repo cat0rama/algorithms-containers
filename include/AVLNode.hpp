@@ -19,14 +19,14 @@ template <typename T> struct AVLNode : public TreeNode<T> {
 
     constexpr AVLNode(AVLNode&& t_node) noexcept : TreeNode<T>(std::move(t_node)) {
         m_height = std::exchange(t_node.m_height, 0);
-        m_key = std::exchange(t_node.m_key, 0);
     }
+
+    virtual ~AVLNode() = default;
 
   public:
     AVLNode& operator=(AVLNode<T>&& t_node) noexcept {
         if (this != &t_node) {
             m_height = std::exchange(t_node.m_height, 0);
-            m_key = std::exchange(t_node.m_key, 0);
             TreeNode<T>::operator=(std::move(t_node));
         }
 
@@ -34,7 +34,6 @@ template <typename T> struct AVLNode : public TreeNode<T> {
     }
 
   public:
-    std::uint8_t m_key;
     std::size_t m_height = defines::DEFAULT_HEIGHT;
 };
 }

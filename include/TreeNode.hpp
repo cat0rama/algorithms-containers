@@ -21,7 +21,7 @@ template <typename T> struct TreeNode : public INode {
 
     constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
 
-    virtual ~TreeNode() {}
+    virtual ~TreeNode() = default;
 
     // protected чтобы нельзя было создавать производный обьект через ссылку на базовый класс
   protected:
