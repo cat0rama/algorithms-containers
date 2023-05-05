@@ -6,7 +6,7 @@
 #include "TreeNode.hpp"
 
 namespace own {
-template <typename T> struct AVLNode : public TreeNode<T> {
+template <typename T> struct AVLNode : public w<T> {
     constexpr AVLNode() noexcept : m_key(0), TreeNode<T>() {}
 
     template <typename TT,

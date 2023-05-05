@@ -6,10 +6,13 @@
 #include "defines.hpp"
 
 namespace own {
-	template <typename T, class Allocator = std::allocator<T>>
-	class unordered_map {
+template <typename T, class Allocator = std::allocator<T>>
+class unordered_map {
+  public:
 
-	};
+  private:
+
+};
 }
 
 #endif

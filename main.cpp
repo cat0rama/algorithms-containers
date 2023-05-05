@@ -62,13 +62,15 @@ int main() {
  //   vec2.erase(vec2.begin());
 	vector<int> vec = {6, 5, 5, 4};
 
-	auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
+	/*auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
 
 	std::for_each(vec.begin(), vec.end(), [](auto elem) { 
 		std::cout << elem << ' ';
-	});
+	});*/
 
-	/*AVLTree<int> d;
+	vector<int> lo;
 
-	auto elem = d.insert(d.get_root(), 3);*/
+	lo.swap(vec);
+
+	std::cout << lo.size() << std::endl;
 }

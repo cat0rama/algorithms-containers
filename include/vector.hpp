@@ -290,6 +290,13 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         m_size = 0;
     }
 
+    void swap(vector<T>& t_other) noexcept { 
+        std::swap(m_data, t_other.m_data);
+        std::swap(m_size, t_other.m_size);
+        std::swap(m_capacity, t_other.m_capacity);
+        std::swap(m_allocator, t_other.m_allocator);
+    }
+
     MODIFIRE : pointer m_data;
     std::size_t m_size;
     std::size_t m_capacity;
