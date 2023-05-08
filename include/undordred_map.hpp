@@ -29,13 +29,16 @@ public:
 
   public:
     unordered_map(std::size_t t_capacity = DEFAULT_TABLE_SIZE): 
-    m_capacity(t_capacity), m_size(0) {
-        m_table.resize(m_capacity);
+    m_size(0) {
+        m_table.resize(t_capacity);
     }
 
     ~unordered_map() = default;
 
+    // конструкторы, операторы(копирование, перемещение)
+
   public:
+    // вместо числа нужно возвращать итератор
     template <typename U> std::pair<int, bool> insert(U&& t_pair) { 
         auto index = get_index(t_pair.first);
 
@@ -50,7 +53,7 @@ public:
 
     // возвращает индекс по модулю размера от хеша
     [[nodiscard]] constexpr std::size_t get_index(const T& t_key) const noexcept {
-        return hash(t_key) % m_capacity;
+        return hash(t_key) % m_table.capacity();
     }
 
   public:
@@ -71,15 +74,14 @@ public:
 
           return elem.front().second;
       }
+
   private:
-    // обертка над std::hash
     [[nodiscard]] constexpr std::size_t hash(const T& t_key) const noexcept {
         return std::hash<T>()(t_key);
     }
 
   private:
     std::vector<std::forward_list<value_type>> m_table;
-    std::size_t m_capacity;
     std::size_t m_size;
 };
 } // namespace own

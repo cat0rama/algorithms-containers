@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "undordred_map.hpp"
 #include "vector.hpp"
@@ -77,8 +78,11 @@ int main() {
 
 	unordered_map<int, int> d;
 
-	auto l = d.insert(std::make_pair(3, 3));
-    std::cout << d[3] << std::endl;
-    std::cout << d[5] << std::endl;
-    std::cout << l.second;
+	for (int i = 0; i < 64; i++) {
+        auto l = d.insert(std::make_pair(i, i + 1));
+	}
+
+	for (int i = 0; i < 64; i++) {
+        std::cout << d[i] << std::endl;
+    }
 }
