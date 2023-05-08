@@ -6,7 +6,7 @@
 #include "TreeNode.hpp"
 
 namespace own {
-template <typename T> struct AVLNode : public w<T> {
+template <typename T> struct AVLNode : public TreeNode<T> {
     constexpr AVLNode() noexcept : m_key(0), TreeNode<T>() {}
 
     template <typename TT,
@@ -36,6 +36,6 @@ template <typename T> struct AVLNode : public w<T> {
   public:
     std::size_t m_height = defines::DEFAULT_HEIGHT;
 };
-}
+} // namespace own
 
 #endif

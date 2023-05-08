@@ -42,6 +42,6 @@ template <typename T> struct TreeNode : public INode {
     TreeNode* m_left;
     TreeNode* m_right;
 };
-}
+} // namespace own
 
 #endif

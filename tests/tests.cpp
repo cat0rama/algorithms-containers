@@ -13,7 +13,7 @@ using namespace own;
 TEST(VECTOR_CONSTRUCTOR_TESTS, DEFAULT_CONSTRUCTOR_TEST) {
     vector<int> vec;
     EXPECT_EQ(vec.size(), 0);
-    EXPECT_EQ(vec.capacity(), DEFAULT_CAPACITY);
+    EXPECT_EQ(vec.capacity(), DEFAULT_CAPACITY * FACTOR);
 }
 
 TEST(VECTOR_CONSTRUCTOR_TESTS, CONSTRUCTOR_WITH_SIZE) {

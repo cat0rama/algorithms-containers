@@ -1,8 +1,8 @@
 #ifndef ITREE_HPP_H
 #define ITREE_HPP_H
 
-#include "defines.hpp"
 #include "AVLNode.hpp"
+#include "defines.hpp"
 
 // абстрактный класс ноды для построения иерархии
 

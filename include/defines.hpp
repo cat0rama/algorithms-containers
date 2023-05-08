@@ -21,6 +21,7 @@
 
 namespace own::defines {
 constexpr int DEFAULT_HEIGHT = 1;
+constexpr std::size_t DEFAULT_TABLE_SIZE = 32;
 constexpr std::size_t DEFAULT_CAPACITY = 5;
 constexpr std::size_t FACTOR = 2;
 constexpr bool NON_CONST = false;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 
+#include "undordred_map.hpp"
 #include "vector.hpp"
 #include "set.hpp"
 #include "BSTree.hpp"
@@ -60,17 +61,24 @@ int main() {
 	//std::vector<Test> vec2 = {Test(1), Test(2), Test(3)};
 
  //   vec2.erase(vec2.begin());
-	vector<int> vec = {6, 5, 5, 4};
+	//vector<int> vec = {6, 5, 5, 4};
 
-	/*auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
+	///*auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
 
-	std::for_each(vec.begin(), vec.end(), [](auto elem) { 
-		std::cout << elem << ' ';
-	});*/
+	//std::for_each(vec.begin(), vec.end(), [](auto elem) { 
+	//	std::cout << elem << ' ';
+	//});*/
 
-	vector<int> lo;
+	//vector<int> lo;
 
-	lo.swap(vec);
+	//lo.swap(vec);
 
-	std::cout << lo.size() << std::endl;
+	//std::cout << lo.size() << std::endl;
+
+	unordered_map<int, int> d;
+
+	auto l = d.insert(std::make_pair(3, 3));
+    std::cout << d[3] << std::endl;
+    std::cout << d[5] << std::endl;
+    std::cout << l.second;
 }

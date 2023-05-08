@@ -33,11 +33,8 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     using const_reverse_iterator = own::reverse_iterator<const_iterator>;
 
   public:
-    constexpr vector() : m_capacity(DEFAULT_CAPACITY), m_size(0) {
-        m_data = m_allocator.allocate(m_capacity);
-    }
-
-    explicit constexpr vector(std::size_t t_capacity) : m_size(0), m_capacity(t_capacity * FACTOR) {
+    explicit constexpr vector(std::size_t t_capacity = DEFAULT_CAPACITY)
+        : m_size(0), m_capacity(t_capacity * FACTOR) {
         m_data = m_allocator.allocate(m_capacity);
     }
 
@@ -196,8 +193,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
          */
     }
 
-    template <typename... Args> constexpr 
-    reference emplace_back(Args&&... t_args) {
+    template <typename... Args> constexpr reference emplace_back(Args&&... t_args) {
         if (m_capacity == m_size) {
             reserve(m_size * FACTOR);
         }
@@ -273,7 +269,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         m_size--;
     }
 
-    template <typename Y> iterator emplace(const_iterator t_pos, Y&& t_arg) { 
+    template <typename Y> iterator emplace(const_iterator t_pos, Y&& t_arg) {
         return insert(t_pos, std::forward<Y>(t_arg));
     }
 
@@ -283,14 +279,14 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         insert(t_pos, std::forward<LL>(t_elem));
         return iterator(m_data + sizeof...(t_args));
     }
-   
+
     constexpr void clear() noexcept {
         // вызывает деструкторы у всех обьектов в диапозоне
         std::destroy(begin(), end());
         m_size = 0;
     }
 
-    void swap(vector<T>& t_other) noexcept { 
+    void swap(vector<T>& t_other) {
         std::swap(m_data, t_other.m_data);
         std::swap(m_size, t_other.m_size);
         std::swap(m_capacity, t_other.m_capacity);

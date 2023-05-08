@@ -150,7 +150,9 @@ class BSTree : protected NodeWrapper<T, TreeNode<T>> {
             }
         }
 
-        if (curr == nullptr) { return; }
+        if (curr == nullptr) {
+            return;
+        }
 
         if (curr->m_left == nullptr || curr->m_right == nullptr) {
             node* new_curr = nullptr;
@@ -160,7 +162,9 @@ class BSTree : protected NodeWrapper<T, TreeNode<T>> {
                 new_curr = curr->m_left;
             }
 
-            if (prev == nullptr) { return; }
+            if (prev == nullptr) {
+                return;
+            }
 
             if (curr == prev->m_left) {
                 prev->m_left = new_curr;
@@ -216,7 +220,7 @@ class BSTree : protected NodeWrapper<T, TreeNode<T>> {
     [[nodiscard]] node* get_root() noexcept { return m_root; }
 
   protected:
-      // down cast до типа ноды данной структуры данных
+    // down cast до типа ноды данной структуры данных
     node* m_root = static_cast<node*>(NodeWrapper<T>::m_node);
 };
 } // namespace own
