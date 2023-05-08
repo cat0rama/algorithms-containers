@@ -15,7 +15,7 @@ struct INode {
 };
 
 // подумать как можно сделать лучше, слишком много проблем возникает при данном подходе
-template <typename L, typename U = AVLNode<L>> struct NodeWrapper {
+template <typename L, typename U = TreeNode<L>> struct NodeWrapper {
     U* m_node = nullptr;
     using value = U;
 };

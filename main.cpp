@@ -76,7 +76,7 @@ int main() {
 
 	//std::cout << lo.size() << std::endl;
 
-	unordered_map<int, int> d;
+	/*unordered_map<int, int> d;
 
 	for (int i = 0; i < 64; i++) {
         auto l = d.insert(std::make_pair(i, i + 1));
@@ -84,5 +84,11 @@ int main() {
 
 	for (int i = 0; i < 64; i++) {
         std::cout << d[i] << std::endl;
-    }
+    }*/
+
+	BSTree<int> tree;
+
+	tree.insert(4);
+
+	tree.print();
 }
