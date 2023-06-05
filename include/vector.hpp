@@ -10,8 +10,6 @@
 #include "iterator.hpp"
 #include "traits.hpp"
 
-// https://en.cppreference.com/w/cpp/container/vector
-// ДОПИСАТЬ!
 namespace own {
 //пока что убрал final(для тестов), потом надо будет вернуть на место
 using namespace defines;
@@ -47,6 +45,8 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
     constexpr vector(const std::initializer_list<T>& t_list)
         : vector(std::distance(t_list.begin(), t_list.end())) {
         std::transform(t_list.begin(), t_list.end(), std::back_inserter(*this),
+    // Если не форвардить обьект, то будет вызываться лишний консутрктор
+    // копирования https://godbolt.org/z/9Kj48r5ab
                        [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
     }
 
@@ -56,9 +56,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
                                     std::input_iterator_tag>::value>>
     constexpr vector(InputIt t_first, InputIt t_last) : vector(std::distance(t_first, t_last)) {
         std::transform(t_first, t_last, std::back_inserter(*this),
-                       // Если не форвардить обьект, то будет вызываться лишний консутрктор
-                       // копирования https://godbolt.org/z/9Kj48r5ab
-                       [](auto&& t_elem) { return std::forward<decltype(t_elem)>(t_elem); });
+                       [](auto& t_elem) { return t_elem; });
     }
 
     template <typename CC,
@@ -103,7 +101,7 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
         }
 
         try {
-            std::uninitialized_copy(t_from, t_from + t_size, t_to);
+            std::uninitialized_move(t_from, t_from + t_size, t_to);
         } catch (...) {
             // удаляю память через deallocate, который вызовет деструкторы у обьектов
             m_allocator.deallocate(t_to, t_size);
@@ -275,8 +273,8 @@ template <typename T, typename Allocator = std::allocator<T>> class vector {
 
     template <typename LL, typename... Args>
     iterator emplace(const_iterator t_pos, LL&& t_elem, Args&&... t_args) {
-        emplace(t_pos, std::forward<Args>(t_args)...);
         insert(t_pos, std::forward<LL>(t_elem));
+        emplace(t_pos, std::forward<Args>(t_args)...);
         return iterator(m_data + sizeof...(t_args));
     }
 

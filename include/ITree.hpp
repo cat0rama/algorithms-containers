@@ -1,7 +1,6 @@
 #ifndef ITREE_HPP_H
 #define ITREE_HPP_H
 
-#include "AVLNode.hpp"
 #include "defines.hpp"
 
 // абстрактный класс ноды для построения иерархии
@@ -18,7 +17,7 @@ struct INode {
 template <typename L, typename U = TreeNode<L>> struct NodeWrapper {
     U* m_node = nullptr;
     using value = U;
-};
+}; 
 } // namespace own
 
 #endif

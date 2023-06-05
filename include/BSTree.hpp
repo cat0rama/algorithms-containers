@@ -194,7 +194,8 @@ class BSTree : protected NodeWrapper<T, TreeNode<T>> {
         }
     }
 
-    template <typename Func> static constexpr void post_order(node* t_root, Func t_fn) {
+    template <typename NodeType, typename Func> 
+    static constexpr void post_order(NodeType* t_root, Func t_fn) {
         if (t_root != nullptr) {
             post_order(t_root->m_left, t_fn);
             post_order(t_root->m_right, t_fn);
@@ -202,7 +203,8 @@ class BSTree : protected NodeWrapper<T, TreeNode<T>> {
         }
     }
 
-    template <typename Func> static constexpr void inorder(node* t_root, Func t_fn) {
+    template <typename NodeType, typename Func> 
+    static constexpr void inorder(NodeType* t_root, Func t_fn) {
         if (t_root != nullptr) {
             inorder(t_root->m_left, t_fn);
             t_fn(t_root);

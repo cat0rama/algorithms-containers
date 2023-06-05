@@ -24,6 +24,9 @@ template <typename T, bool IsIterConst> struct iterator_wrapper {
 
     constexpr iterator_wrapper(const iterator_wrapper<T, false>& t_iter) : m_data(&(*t_iter)) {}
 
+    constexpr iterator_wrapper(const iterator_wrapper<T, true>& t_iter)
+        : m_data(const_cast<T*>(& (*t_iter))) {}
+
   public:
     constexpr iterator& operator++() noexcept {
         m_data++;

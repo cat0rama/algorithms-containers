@@ -42,19 +42,19 @@ template <typename T> class AVLTree {
     }
 
   protected:
-    // node* copy_tree(node* t_node) {
-    //    if (t_node == nullptr) {
-    //        return nullptr;
-    //    }
+     node* copy_tree(node* t_node) {
+        if (t_node == nullptr) {
+            return nullptr;
+        }
+        
+        node* nd = static_cast<node*>(new_node(t_node->m_val));
+        nd->m_key = t_node->m_key;
+        nd->m_height = t_node->m_height;
+        nd->m_left = copy_tree(static_cast<node*>(t_node->m_left));
+        nd->m_right = copy_tree(static_cast<node*>(t_node->m_right));
 
-    //    /*node* nd = static_cast<node*>(new_node(t_node->m_val));
-    //    nd->m_key = t_node->m_key;
-    //    nd->m_height = t_node->m_height;
-    //    nd->m_left = copy_tree(static_cast<node*>(t_node->m_left));
-    //    nd->m_right = copy_tree(static_cast<node*>(t_node->m_right));*/
-
-    //    return node;
-    //}
+        return node;
+    }
 
     void destroy() noexcept {
         if (m_root == nullptr) {
@@ -70,7 +70,7 @@ template <typename T> class AVLTree {
             return new node(std::forward<YY>(t_elem));
         }
 
-        if (t_elem < t_node->m_val) {
+        if (t_elem < t_node->m)_key) {
             t_node->m_left = insert(t_node, std::forward<YY>(t_elem));
         } else {
             t_node->m_right = insert(t_node, std::forward<YY>(t_elem));

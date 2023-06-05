@@ -4,11 +4,12 @@
 #include <memory>
 #include <string>
 
+#include "BSTree.hpp"
 #include "undordred_map.hpp"
 #include "vector.hpp"
 #include "set.hpp"
-#include "BSTree.hpp"
 #include "tests/tests.hpp"
+#include "AVLTree.hpp"
 
 using namespace own;
 
@@ -62,13 +63,13 @@ int main() {
 	//std::vector<Test> vec2 = {Test(1), Test(2), Test(3)};
 
  //   vec2.erase(vec2.begin());
-	//vector<int> vec = {6, 5, 5, 4};
+	vector<int> vec = {6, 5, 5, 4};
 
-	///*auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
+	auto l = vec.emplace(vec.begin(), 1, 2, 3, 4);
 
-	//std::for_each(vec.begin(), vec.end(), [](auto elem) { 
-	//	std::cout << elem << ' ';
-	//});*/
+	std::for_each(vec.begin(), vec.end(), [](auto elem) { 
+		std::cout << elem << ' ';
+	});
 
 	//vector<int> lo;
 
@@ -85,10 +86,9 @@ int main() {
 	for (int i = 0; i < 64; i++) {
         std::cout << d[i] << std::endl;
     }*/
-
-	BSTree<int> tree;
-
-	tree.insert(4);
-
-	tree.print();
+    //auto c = vector<int>::iterator(vec.cbegin());
+	
+	AVLTree<int> ve;
+    auto c = ve.get_root();
+    c = ve.insert(ve.get_root(), 3);
 }
