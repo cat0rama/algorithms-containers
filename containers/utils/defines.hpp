@@ -3,6 +3,9 @@
 
 #include <cstdint>
 #include <type_traits>
+#include <algorithm>
+#include <initializer_list>
+#include <exception>
 
 // потом сделать через флаг в cmake
 #define SWITCH_MODIFIRE
@@ -19,7 +22,7 @@
 #define MODIFIRE private
 #endif
 
-namespace own::defines {
+namespace s21::defines {
 constexpr int DEFAULT_HEIGHT = 1;
 constexpr std::size_t DEFAULT_TABLE_SIZE = 32;
 constexpr std::size_t DEFAULT_CAPACITY = 5;
