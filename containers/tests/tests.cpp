@@ -129,15 +129,15 @@ TEST(ALL, CONTAINERS_TEST) {
   std::for_each(st.begin(), st.end(),
                 [](auto elem) { std::cout << elem << std::endl; });
 
-  // AVLTree<int> avl;
+  AVLTree<int> avl;
 
-  // avl.Insert(3);
+  avl.insert(avl.get_root(), 3);
 
-  // avl.Insert(5);
+  avl.insert(avl.get_root(), 5);
 
-  // avl.Insert(6);
+  avl.insert(avl.get_root(), 6);
 
-  // avl.Print();
+  avl.print();
 
 }
 

@@ -4,7 +4,7 @@
 #include "AVLNode.hpp"
 #include "BSTree.hpp"
 
-namespace own {
+namespace s21 {
 template <typename T> class AVLTree {
   public:
     using node = AVLNode<T>;
@@ -53,7 +53,7 @@ template <typename T> class AVLTree {
         nd->m_left = copy_tree(static_cast<node*>(t_node->m_left));
         nd->m_right = copy_tree(static_cast<node*>(t_node->m_right));
 
-        return node;
+        return t_node;
     }
 
     void destroy() noexcept {
@@ -70,7 +70,7 @@ template <typename T> class AVLTree {
             return new node(std::forward<YY>(t_elem));
         }
 
-        if (t_elem < t_node->m)_key) {
+        if (t_elem < t_node->m_key) {
             t_node->m_left = insert(t_node, std::forward<YY>(t_elem));
         } else {
             t_node->m_right = insert(t_node, std::forward<YY>(t_elem));
@@ -128,6 +128,11 @@ template <typename T> class AVLTree {
         }
 
         return t_node;
+    }
+
+    void print() {
+        static_assert(std::is_arithmetic_v<T>, "arithmetic type required.\n");
+        inorder(m_root, [](auto t_node) { std::cout << t_node->m_val << ' '; });
     }
 
     [[nodiscard]] const node* get_root() const noexcept { return m_root; }

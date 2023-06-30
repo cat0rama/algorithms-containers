@@ -5,7 +5,7 @@
 
 // подумать насчет операторов сравнения
 
-namespace own {
+namespace s21 {
 template <typename T> struct TreeNode : public INode {
     constexpr TreeNode() noexcept {}
      
@@ -18,7 +18,7 @@ template <typename T> struct TreeNode : public INode {
 
     template <typename TT>
     constexpr TreeNode(TT&& t_val, TreeNode* t_left, TreeNode* t_right, TreeNode* t_parent = nullptr)
-        : TreeNode(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right), m_parent(t_parent) {}
+        : m_val(std::forward<TT>(t_val)), m_left(t_left), m_right(t_right), m_parent(t_parent) {}
 
     constexpr TreeNode(TreeNode&& t_node) noexcept { *this = std::move(t_node); }
 

@@ -8,10 +8,9 @@
 #include "iterator.hpp"
 
 namespace s21 {
-//пока что убрал final(для тестов), потом надо будет вернуть на место
 using namespace defines;
 template <typename T, typename Allocator = std::allocator<T>>
-class vector {
+class vector final {
  public:
   using value_type = T;
   using allocator_type = Allocator;

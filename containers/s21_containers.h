@@ -5,5 +5,6 @@
 #include "vector/vector.hpp"
 #include "queue/queue.hpp"
 #include "stack/stack.hpp"
+#include "trees/AVLTree.hpp"
 
 #endif
